@@ -45,9 +45,9 @@ class Square {
 	
 	Square(int i, int j) {	// Initialize Board
 		
-		this.color = (i+j)%2==0 ? 'b' : 'w';
+		this.color = (i+j)%2==0 ? 'B' : 'W';
 		if (i <= 1 || i >= 6) {
-			char piececolor = i < 4 ? 'w' : 'b';
+			char piececolor = i < 4 ? 'B' : 'W';
 			if (i == 1 || i == 6)
 				this.piece = new Pawn(i, j, piececolor);
 			else {

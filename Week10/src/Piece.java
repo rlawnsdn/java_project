@@ -3,7 +3,8 @@ public abstract class Piece {
 
 	int pos_x, pos_y;
 	char color, type;
-	
+	boolean Moveable[][] = new boolean[8][8];
+
 	//	pos_x, pos_y:	Position of the Piece. (0~7)
 	//					x for row 1~8,	y for column a~h
 	//	color:	'b': black,	'w': white
@@ -15,5 +16,5 @@ public abstract class Piece {
 		this.pos_y = y;
 	}
 	
-	abstract void findMovables();
+	abstract void findMovables(Square[][] board);
 }
