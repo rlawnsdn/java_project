@@ -11,10 +11,5 @@ public abstract class Piece {
 	//  type:	'K': King,	'Q': Queen, 'B': Bishop,
 	//			'P': Pawn,	'R': Rook,	'N': Knight
 	
-	void move(int x, int y) {
-		this.pos_x = x;
-		this.pos_y = y;
-	}
-	
-	abstract void findMovables(Square[][] board);
+	abstract void findMovables(Square[][] board, boolean bqc, boolean bkc, boolean wqc, boolean wkc);
 }

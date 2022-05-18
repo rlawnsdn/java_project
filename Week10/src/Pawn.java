@@ -9,16 +9,8 @@ public class Pawn extends Piece {
 		this.type = 'P';
 	}
 	
-	@Override
-	void move(int x, int y) {
-		
-		this.pos_x = x;
-		this.pos_y = y;
-		
-	}
-	
-	void findMovables(Square[][] board) {
-		if(this.color=='B'){
+	void findMovables(Square[][] board, boolean bqc, boolean bkc, boolean wqc, boolean wkc) {
+		if(this.color=='w'){
 			for(int i=0; i<8; i++){
 				for(int j=0; j<8; j++){
 					if(this.pos_x+1 == i){
@@ -26,7 +18,7 @@ public class Pawn extends Piece {
 							if(j==this.pos_y) Moveable[i][j]=true; //폰은 앞으로 한 칸 전진할 수 있다
 							else{}
 						}
-						else if(board[i][j].color=='W' && (Math.abs(this.pos_y-j)==1)) Moveable[i][j]=true; //폰은 상대 말을 잡을 때에는 대각선으로 한 칸 이동한다
+						else if(board[i][j].color=='b' && (Math.abs(this.pos_y-j)==1)) Moveable[i][j]=true; //폰은 상대 말을 잡을 때에는 대각선으로 한 칸 이동한다
 						else Moveable[i][j]=false;
 					}
 					else Moveable[i][j]=false;
@@ -42,7 +34,7 @@ public class Pawn extends Piece {
 							if(j==this.pos_y) Moveable[i][j]=true;
 							else {}
 						}
-						else if(board[i][j].color=='B' && (Math.abs(this.pos_y-j)==1)) Moveable[i][j]=true;
+						else if(board[i][j].color=='w' && (Math.abs(this.pos_y-j)==1)) Moveable[i][j]=true;
 						else Moveable[i][j]=false;
 					}
 					else Moveable[i][j]=false;
