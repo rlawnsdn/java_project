@@ -8,10 +8,12 @@ public class MainOperation {
 		Scanner scn = new Scanner(System.in); // Input for Testing with Console
 		int x1, y1, x2, y2;
 		
+		BoardGUI bgui = new BoardGUI(chessBoard.board);
+		
 		while (!chessBoard.isFinish()) {
 			
 			chessBoard.printBoard();
-
+			
 			//1. 클릭으로 원래 좌표(x1, y1)과 이동할 좌표(x2, y2)를 추출
 			System.out.println((chessBoard.turn%2==0? "White":"Black") + "'s Turn");
 			x1 = scn.nextInt();
@@ -27,6 +29,7 @@ public class MainOperation {
 			//5. 기타 등등...
 
 			chessBoard.turn++;
+			bgui.updateBoardGUI(chessBoard.board);
 		}
 	}
 
