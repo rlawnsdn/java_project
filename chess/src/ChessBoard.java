@@ -1,9 +1,29 @@
-class Square {
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+class Square extends JPanel {
+
+	int x, y;
+	JLabel pieceimg;
+	JButton btn;
+	boolean clickable;
+	
 	char color;
 	Piece piece;
 	
 	Square(int i, int j) {	// Initialize Board
+		
+		this.x = i;
+		this.y = j;
 		
 		this.color = (i+j)%2==0 ? 'b' : 'w';
 		if (i <= 1 || i >= 6) {
@@ -22,28 +42,86 @@ class Square {
 		}
 		else
 			this.piece = null;
+		
+		setSize(80, 80);
+		setLayout(new GridLayout(1,1));
+		setBackground(this.color == 'b' ? Color.getHSBColor(32/360f, 0.90f, 0.18f) : Color.getHSBColor(32/360f, 0.23f, 0.84f));
+		
+		ImageIcon icn;
+		if (this.piece != null && this.piece.type != 'F')
+		{
+			icn = new ImageIcon("src/img/" + this.piece.color + this.piece.type + "_n.png");
+			pieceimg = new JLabel(icn);
+		}
+		else
+		{
+			icn = new ImageIcon("src/img/none.png");
+			pieceimg = new JLabel(icn);
+		}
+		pieceimg.setPreferredSize(new Dimension(80, 80));
+		pieceimg.setAlignmentX(CENTER_ALIGNMENT);
+		pieceimg.setAlignmentY(CENTER_ALIGNMENT);
+		
+		btn = new JButton();
+		btn.setPreferredSize(new Dimension(80, 80));
+		btn.setAlignmentX(CENTER_ALIGNMENT);
+		btn.setAlignmentY(CENTER_ALIGNMENT);
+		
+		this.add(pieceimg);
+		this.add(btn);
+		
+		clickable = false;
+	}
+	
+	void updatePiecePosition()
+	{
+		if (piece == null) return;
+		
+		piece.pos_x = x;
+		piece.pos_y = y;
+	}
+	
+	void updatePanel()
+	{
+		ImageIcon icn;
+		if (this.piece != null && this.piece.type != 'F')
+		{
+			icn = new ImageIcon("src/img/" + this.piece.color + this.piece.type + "_n.png");
+			pieceimg.setIcon(icn);
+		}
+		else
+		{
+			icn = new ImageIcon("src/img/none.png");
+			pieceimg.setIcon(icn);
+		}
 	}
 }
 
-public class ChessBoard {
+public class ChessBoard extends JFrame {
 	
-	Square[][] board;
+	Square[][] sq;
 	int turn;
 	boolean gameEnds;
 	boolean wr1, wr2, wk, br1, br2, bk; // white rook1, white rook2, white king, black rook1, black rook2, black king의 이동여부 (true면 아직 이동안한 것)
 	boolean wkc, wqc, bkc, bqc; //캐슬링 가능여부
+	
+	boolean selectstate; // false: 기물 선택, true: 위치 선택
+	
+	int x1, y1, x2, y2;
 
 	ChessBoard() {
 		
-		this.board = new Square[8][8];
+		this.sq = new Square[8][8];
 		for (int i=0; i<8; i++)
 			for (int j=0; j<8; j++)
-				board[i][j] = new Square(i, j);
+				sq[i][j] = new Square(i, j);
 		
 		this.turn = 0;
 		this.wr1 = true; this.wr2 = true; this.wk = true; this.br1 = true; this.br2 = true; this.bk = true;
 		this.wkc = true; this.wqc = true; this.bkc = true; this.bqc = true; 
 		this.gameEnds = false;
+		
+		this.selectstate = false;
 	}
 	
 	void printBoard() { // Test with Console before implementing GUI
@@ -51,15 +129,61 @@ public class ChessBoard {
 		for (int i=7; i>=0; i--) {
 			for (int j=0; j<8; j++) {
 				System.out.print('|');
-				if (board[i][j].piece != null) { // && board[i][j].piece.type != 'F') {
-					System.out.print(board[i][j].piece.color);
-					System.out.print(board[i][j].piece.type);
+				if (sq[i][j].piece != null) { // && board[i][j].piece.type != 'F') {
+					System.out.print(sq[i][j].piece.color);
+					System.out.print(sq[i][j].piece.type);
 				}
 				else
 					System.out.print("  ");
 			}
 			System.out.println('|');
 		}
+	}
+	
+	void btnInit() { // 버튼 컴포넌트 초기설정
+		
+		for (int i=7; i>=0; i--) {
+			for (int j=0; j<8; j++) {
+				sq[i][j].btn.addActionListener(new SquareClick(i, j, sq[i][j]) {
+					@Override
+					public void actionPerformed (ActionEvent e) {
+						if (!selectstate) {
+							System.out.println("Piece Selected. " + i + "," + j);
+							x1 = i;
+							y1 = j;
+							s.piece.findMovables(sq, bqc, bkc, wqc, wkc);
+							s.piece.checkMovables(); // Debug
+							selectstate = true;
+							
+							setClickable(s.piece.Moveable);
+						}
+						else if (sq[i][j].clickable) {
+							System.out.println("Square Selected. " + i + "," + j);
+							x2 = i;
+							y2 = j;
+							movepiece(x1, y1, x2, y2);
+							selectstate = false;
+							
+							setClickable(true);
+						}
+					}
+				});
+			}
+		}
+	}
+	
+	void setClickable(boolean[][] mov) { // 버튼 활성화 여부 결정
+		
+		for (int i=7; i>=0; i--)
+			for (int j=0; j<8; j++)
+					sq[i][j].clickable = mov[i][j];
+	}
+	
+	void setClickable(boolean clk) { // 버튼 활성화 여부 결정 (일괄)
+		
+		for (int i=7; i>=0; i--)
+			for (int j=0; j<8; j++)
+					sq[i][j].clickable = clk;
 	}
 	
 	public boolean isFinish() {
@@ -70,86 +194,86 @@ public class ChessBoard {
 
 	void movepiece(int x1, int y1, int x2, int y2){ //(x1, y1)에서 (x2, y2)로 이동할 때
 		
-		if(board[x1][y1].piece.type=='K'){
+		if(sq[x1][y1].piece.type=='K'){
 			
 			// 킹이 이동하면 캐슬링 불가능 (킹의 움직임이 유효한 상태라 가정)
-			if (board[x1][y1].piece.color=='b') {this.bk = false;}
+			if (sq[x1][y1].piece.color=='b') {this.bk = false;}
 			else {this.wk = false;}
 			
 			// 캐슬링
 			if (x1 == 0 && y1 == 4 && x2 == 0 && y2 == 2){
-				board[0][2].piece = board[0][4].piece; //킹 이동
-				board[0][4].piece = null;
-				board[0][3].piece = board[0][0].piece; //룩 이동
-				board[0][0].piece = null;
+				sq[0][2].piece = sq[0][4].piece; //킹 이동
+				sq[0][4].piece = null;
+				sq[0][3].piece = sq[0][0].piece; //룩 이동
+				sq[0][0].piece = null;
 			}
 			else if (x1 == 0 && y1 == 4 && x2 == 0 && y2 == 6){
-				board[0][6].piece = board[0][4].piece; //킹 이동
-				board[0][4].piece = null;
-				board[0][5].piece = board[0][7].piece; //룩 이동
-				board[0][7].piece = null;
+				sq[0][6].piece = sq[0][4].piece; //킹 이동
+				sq[0][4].piece = null;
+				sq[0][5].piece = sq[0][7].piece; //룩 이동
+				sq[0][7].piece = null;
 			}
 			else if (x1 == 7 && y1 == 4 && x2 == 7 && y2 == 2){
-				board[7][2].piece = board[7][4].piece; //킹 이동
-				board[7][4].piece = null;
-				board[7][3].piece = board[7][0].piece; //룩 이동
-				board[7][0].piece = null;
+				sq[7][2].piece = sq[7][4].piece; //킹 이동
+				sq[7][4].piece = null;
+				sq[7][3].piece = sq[7][0].piece; //룩 이동
+				sq[7][0].piece = null;
 			}
 			else if (x1 == 7 && y1 == 4 && x2 == 7 && y2 == 6){
-				board[7][6].piece = board[7][4].piece; //킹 이동
-				board[7][4].piece = null;
-				board[7][5].piece = board[7][7].piece; //룩 이동
-				board[7][7].piece = null;
+				sq[7][6].piece = sq[7][4].piece; //킹 이동
+				sq[7][4].piece = null;
+				sq[7][5].piece = sq[7][7].piece; //룩 이동
+				sq[7][7].piece = null;
 			}
 			else
 			{
-				board[x2][y2].piece = board[x1][y1].piece;
-				board[x1][y1].piece = null;
+				sq[x2][y2].piece = sq[x1][y1].piece;
+				sq[x1][y1].piece = null;
 			}
 		}
-		else if (board[x1][y1].piece.type=='R'){ // 룩이 이동하면 캐슬링 불가능 (룩의 움직임이 유효한 상태라 가정)
-			if(board[x1][y1].piece.color=='b'){
+		else if (sq[x1][y1].piece.type=='R'){ // 룩이 이동하면 캐슬링 불가능 (룩의 움직임이 유효한 상태라 가정)
+			if(sq[x1][y1].piece.color=='b'){
 				if(y1==0){this.br1 = false;}
 				else{this.br2 = false;}
 			}
-			else if(board[x1][y1].piece.color=='w'){
+			else if(sq[x1][y1].piece.color=='w'){
 				if(y1==0){this.wr1 = false;}
 				else{this.wr2 = false;}
 			}
 			
-			board[x2][y2].piece = board[x1][y1].piece;
-			board[x1][y1].piece = null;
+			sq[x2][y2].piece = sq[x1][y1].piece;
+			sq[x1][y1].piece = null;
 		}
-		else if(board[x1][y1].piece.type=='P'){ //앙파상
+		else if(sq[x1][y1].piece.type=='P'){ //앙파상
 			if (Math.abs(x1 - x2) == 2){
 				if (x1 < x2){
-					board[x1+1][y1].piece = new Pawn(x1+1, y1, board[x1][y1].piece.color);
-					board[x1+1][y1].piece.type = 'F'; //fake pawn을 만든다
+					sq[x1+1][y1].piece = new Pawn(x1+1, y1, sq[x1][y1].piece.color);
+					sq[x1+1][y1].piece.type = 'F'; //fake pawn을 만든다
 				}
 				else{
-					board[x1-1][y1].piece = new Pawn(x1-1, y1, board[x1][y1].piece.color);
-					board[x1-1][y1].piece.type = 'F';
+					sq[x1-1][y1].piece = new Pawn(x1-1, y1, sq[x1][y1].piece.color);
+					sq[x1-1][y1].piece.type = 'F';
 				}
 			}
 			
-			if (board[x2][y2].piece != null && board[x2][y2].piece.type =='F') // fake pawn이 있을 시 해당 pawn 잡기
+			if (sq[x2][y2].piece != null && sq[x2][y2].piece.type =='F') // fake pawn이 있을 시 해당 pawn 잡기
 			{
-				if (board[x2][y2].piece.color == 'b') board[x2-1][y2].piece = null;
-				else if (board[x2][y2].piece.color == 'w') board[x2+1][y2].piece = null;
+				if (sq[x2][y2].piece.color == 'b') sq[x2-1][y2].piece = null;
+				else if (sq[x2][y2].piece.color == 'w') sq[x2+1][y2].piece = null;
 			}
 			
-			board[x2][y2].piece = board[x1][y1].piece;
-			board[x1][y1].piece = null;
+			sq[x2][y2].piece = sq[x1][y1].piece;
+			sq[x1][y1].piece = null;
 		}
 		else{ //평범한 이동
-			board[x2][y2].piece = board[x1][y1].piece;
-			board[x1][y1].piece = null;
+			sq[x2][y2].piece = sq[x1][y1].piece;
+			sq[x1][y1].piece = null;
 		}
 		
 		for(int i=0; i<8; i++)
 			for(int j=0; j<8; j++)
-				if(board[i][j].piece != null && board[i][j].piece.type =='F' && board[i][j].piece.color == (turn%2 == 0 ? 'b':'w'))
-					board[i][j].piece = null; // 이전 턴에 만든 fake pawn이 있다면, fake pawn을 제거
+				if(sq[i][j].piece != null && sq[i][j].piece.type =='F' && sq[i][j].piece.color == (turn%2 == 0 ? 'b':'w'))
+					sq[i][j].piece = null; // 이전 턴에 만든 fake pawn이 있다면, fake pawn을 제거
 	}
 	
 

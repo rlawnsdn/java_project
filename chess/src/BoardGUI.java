@@ -15,26 +15,26 @@ import javax.swing.JPanel;
 public class BoardGUI {
 
 	BoardFrame bframe;
-	Square[][] sq;
+	ChessBoard cboard;
 	
-	BoardGUI(Square[][] bsq) {
-		bframe = new BoardFrame(bsq);
+	BoardGUI(ChessBoard cb) {
+		bframe = new BoardFrame(cb.sq);
+		cboard = cb;
 	}
 	
 	void updateBoardGUI(Square[][] bsq) {
 		
-		this.sq = bsq;
+		this.cboard.sq = bsq;
 		for (int i=7; i>=0; i--) {
 			for (int j=0; j<8; j++) {
-				bframe.bpanel[i][j].updatePanel(bsq[i][j]);
+				this.cboard.sq[i][j].updatePanel();
+				this.cboard.sq[i][j].updatePiecePosition();
 			}
 		}
 	}
 }
 
 class BoardFrame extends JFrame {
-	
-	BoardPanel[][] bpanel;
 	
 	BoardFrame(Square[][] sq) {
 		setTitle("Chess");
@@ -45,28 +45,23 @@ class BoardFrame extends JFrame {
 		
 		player1.setBounds(1024, 384, 256, 384);
 		player1.setAlignmentY(BOTTOM_ALIGNMENT);
-		player1.setBackground(Color.getHSBColor(38/255f, 84/255f, 83/255f));
+		player1.setBackground(Color.getHSBColor(32/255f, 0, 0.7f));
 		player2.setBounds(0, 0, 256, 384);
 		player2.setAlignmentY(TOP_ALIGNMENT);
-		player2.setBackground(Color.getHSBColor(38/255f, 84/255f, 83/255f));
+		player2.setBackground(Color.getHSBColor(32/255f, 0, 0.7f));
 		chessboard.setBounds(320, 64, 640, 640);
 		chessboard.setAlignmentX(CENTER_ALIGNMENT);
 		chessboard.setAlignmentY(CENTER_ALIGNMENT);
-		chessboard.setBackground(Color.getHSBColor(37/255f, 36/255f, 52/255f));
 		chessboard.setLayout(new GridLayout(8,8));
 		
-		bpanel = new BoardPanel[8][8];
 		for (int i=7; i>=0; i--)
-			for (int j=0; j<8; j++) {
-				bpanel[i][j] = new BoardPanel(i, j, sq[i][j]);
-				chessboard.add(bpanel[i][j]);
-			}
-
+			for (int j=0; j<8; j++)
+				chessboard.add(sq[i][j]);
 		
 		Container c = getContentPane();
 		setResizable(false);
 
-		c.setBackground(Color.getHSBColor(37/255f, 0/255f, 82/255f));
+		c.setBackground(Color.getHSBColor(32/360f, 0.4f, 0.6f));
 		c.setLayout(null);
 		
 		c.add(player2);
@@ -80,60 +75,20 @@ class BoardFrame extends JFrame {
 		setLocationRelativeTo(null);
 		setVisible(true);
 	}
-	
-	class ButtonClickListener implements ActionListener {
-		public void actionPerformed (ActionEvent e) {
-
-		}
-	}
 }
 
-class BoardPanel extends JPanel {
+class SquareClick implements ActionListener{
 	
-	int x, y;
-	Square sq;
-	JLabel pieceimg;
-	
-	BoardPanel(int x, int y, Square sq) {
-		
-		this.x = x;
-		this.y = y;
-		this.sq = sq;
-		
-		setSize(80, 80);
-		setLayout(new GridLayout(1,1));
-		setBackground(sq.color == 'b' ? Color.getHSBColor(0/255f, 0/255f, 0/255f) : Color.getHSBColor(0/255f, 0/255f, 255/255f));
-		
-		ImageIcon icn;
-		if (sq.piece != null && sq.piece.type != 'F')
-		{
-			icn = new ImageIcon("src/img/" + sq.piece.color + sq.piece.type + "_n.png");
-			pieceimg = new JLabel(icn);
-		}
-		else
-		{
-			icn = new ImageIcon("src/img/none.png");
-			pieceimg = new JLabel(icn);
-		}
-		
-		pieceimg.setPreferredSize(new Dimension(80, 80));
-		pieceimg.setAlignmentX(CENTER_ALIGNMENT);
-		pieceimg.setAlignmentY(CENTER_ALIGNMENT);
-		this.add(pieceimg);
-	}
-	
-	void updatePanel(Square sq)
-	{
-		ImageIcon icn;
-		if (sq.piece != null && sq.piece.type != 'F')
-		{
-			icn = new ImageIcon("src/img/" + sq.piece.color + sq.piece.type + "_n.png");
-			pieceimg.setIcon(icn);
-		}
-		else
-		{
-			icn = new ImageIcon("src/img/none.png");
-			pieceimg.setIcon(icn);
-		}
+    final int i, j;
+    final Square s;
+    
+    SquareClick(int i, int j, Square s){
+        this.i = i;
+        this.j = j;
+        this.s = s;
+    }
+    
+	public void actionPerformed (ActionEvent e) {
+
 	}
 }
