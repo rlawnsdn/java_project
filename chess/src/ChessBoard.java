@@ -44,7 +44,7 @@ class Square extends JPanel {
 			this.piece = null;
 		
 		setSize(80, 80);
-		setLayout(new GridLayout(1,1));
+		setLayout(null);
 		setBackground(this.color == 'b' ? Color.getHSBColor(32/360f, 0.90f, 0.18f) : Color.getHSBColor(32/360f, 0.23f, 0.84f));
 		
 		ImageIcon icn;
@@ -58,14 +58,15 @@ class Square extends JPanel {
 			icn = new ImageIcon("src/img/none.png");
 			pieceimg = new JLabel(icn);
 		}
-		pieceimg.setPreferredSize(new Dimension(80, 80));
+		pieceimg.setBounds(0, 0, 80, 80);
 		pieceimg.setAlignmentX(CENTER_ALIGNMENT);
 		pieceimg.setAlignmentY(CENTER_ALIGNMENT);
 		
 		btn = new JButton();
-		btn.setPreferredSize(new Dimension(80, 80));
+		btn.setBounds(0, 0, 80, 80);
 		btn.setAlignmentX(CENTER_ALIGNMENT);
 		btn.setAlignmentY(CENTER_ALIGNMENT);
+		btn.setContentAreaFilled(false);
 		
 		this.add(pieceimg);
 		this.add(btn);
@@ -94,6 +95,36 @@ class Square extends JPanel {
 			icn = new ImageIcon("src/img/none.png");
 			pieceimg.setIcon(icn);
 		}
+		setBackground(this.color == 'b' ? Color.getHSBColor(32/360f, 0.90f, 0.18f) : Color.getHSBColor(32/360f, 0.23f, 0.84f));
+	}
+	
+	void showMovable(boolean movable)
+	{
+		if (movable) {		
+			if (this.piece != null && this.piece.type != 'F') {
+				ImageIcon icn = new ImageIcon("src/img/" + this.piece.color + this.piece.type + "_t.png");
+				pieceimg.setIcon(icn);
+			}
+			setBackground(this.color == 'b' ? Color.getHSBColor(100/360f, 0.70f, 0.30f) : Color.getHSBColor(100/360f, 0.55f, 0.45f));
+		}
+		else
+		{
+			if (this.piece != null && this.piece.type != 'F')
+			{
+				ImageIcon icn = new ImageIcon("src/img/" + this.piece.color + this.piece.type + "_n.png");
+				pieceimg.setIcon(icn);
+			}
+			setBackground(this.color == 'b' ? Color.getHSBColor(32/360f, 0.90f, 0.18f) : Color.getHSBColor(32/360f, 0.23f, 0.84f));
+		}
+	}
+	
+	void showSelectedPiece()
+	{
+		if (this.piece != null && this.piece.type != 'F') {
+			ImageIcon icn = new ImageIcon("src/img/" + this.piece.color + this.piece.type + "_c.png");
+			pieceimg.setIcon(icn);
+		}
+		setBackground(this.color == 'b' ? Color.getHSBColor(210/360f, 0.70f, 0.30f) : Color.getHSBColor(210/360f, 0.55f, 0.45f));
 	}
 }
 
@@ -129,7 +160,7 @@ public class ChessBoard extends JFrame {
 		for (int i=7; i>=0; i--) {
 			for (int j=0; j<8; j++) {
 				System.out.print('|');
-				if (sq[i][j].piece != null) { // && board[i][j].piece.type != 'F') {
+				if (sq[i][j].piece != null) {
 					System.out.print(sq[i][j].piece.color);
 					System.out.print(sq[i][j].piece.type);
 				}
@@ -147,15 +178,18 @@ public class ChessBoard extends JFrame {
 				sq[i][j].btn.addActionListener(new SquareClick(i, j, sq[i][j]) {
 					@Override
 					public void actionPerformed (ActionEvent e) {
-						if (!selectstate) {
+						if (!selectstate || (s.piece != null && s.piece.color == (turn%2 == 0 ? 'w' : 'b'))) {
 							System.out.println("Piece Selected. " + i + "," + j);
 							x1 = i;
 							y1 = j;
+							
 							s.piece.findMovables(sq, bqc, bkc, wqc, wkc);
-							s.piece.checkMovables(); // Debug
+							
+							s.piece.checkMovables(); // Debug: 콘솔에서 유효이동칸 확인하는 용도로 쓴 후 지우기
 							selectstate = true;
 							
 							setClickable(s.piece.Moveable);
+							s.showSelectedPiece();
 						}
 						else if (sq[i][j].clickable) {
 							System.out.println("Square Selected. " + i + "," + j);
@@ -164,7 +198,8 @@ public class ChessBoard extends JFrame {
 							movepiece(x1, y1, x2, y2);
 							selectstate = false;
 							
-							setClickable(true);
+							setClickable(true); // 추후 서버 구현 시 턴에 따라 클릭 영역 제한하도록 수정 예정.
+							turn++;
 						}
 					}
 				});
@@ -175,8 +210,11 @@ public class ChessBoard extends JFrame {
 	void setClickable(boolean[][] mov) { // 버튼 활성화 여부 결정
 		
 		for (int i=7; i>=0; i--)
-			for (int j=0; j<8; j++)
-					sq[i][j].clickable = mov[i][j];
+			for (int j=0; j<8; j++) {
+				sq[i][j].clickable = mov[i][j];
+				sq[i][j].showMovable(mov[i][j]);
+			}
+
 	}
 	
 	void setClickable(boolean clk) { // 버튼 활성화 여부 결정 (일괄)
