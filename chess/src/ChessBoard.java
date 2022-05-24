@@ -171,6 +171,16 @@ public class ChessBoard extends JFrame {
 		}
 	}
 	
+	Square[][] copyBoard(Square[][] sq) {
+		
+		Square[][] prev = new Square[8][8];
+		for (int i=0; i<8; i++)
+			for (int j=0; j<8; j++)
+				prev[i][j] = sq[i][j];
+		
+		return prev;
+	}
+	
 	void btnInit() { // 버튼 컴포넌트 초기설정
 		
 		for (int i=7; i>=0; i--) {
@@ -192,10 +202,16 @@ public class ChessBoard extends JFrame {
 							s.showSelectedPiece();
 						}
 						else if (sq[i][j].clickable) {
+							
+							Square[][] prev = copyBoard(sq); // 현재 board 상태 저장
+							
 							System.out.println("Square Selected. " + i + "," + j);
 							x2 = i;
 							y2 = j;
 							movepiece(x1, y1, x2, y2);
+							
+							// ** Check 판단 하고서 만약 check이면 prev를 다시 sq에 먹이기
+
 							selectstate = false;
 							
 							setClickable(true); // 추후 서버 구현 시 턴에 따라 클릭 영역 제한하도록 수정 예정.
