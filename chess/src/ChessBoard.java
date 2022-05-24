@@ -74,6 +74,18 @@ class Square extends JPanel {
 		clickable = false;
 	}
 	
+	Square(Square s) { // Copy the state of the Square
+		this.x = s.x;
+		this.y = s.y;
+		
+		this.pieceimg = s.pieceimg;
+		this.btn = s.btn;
+		this.clickable = s.clickable;
+		
+		this.color = s.color;
+		this.piece = s.piece;
+	}
+	
 	void updatePiecePosition()
 	{
 		if (piece == null) return;
@@ -176,7 +188,7 @@ public class ChessBoard extends JFrame {
 		Square[][] prev = new Square[8][8];
 		for (int i=0; i<8; i++)
 			for (int j=0; j<8; j++)
-				prev[i][j] = sq[i][j];
+				prev[i][j] = new Square(sq[i][j]);
 		
 		return prev;
 	}
@@ -211,7 +223,7 @@ public class ChessBoard extends JFrame {
 							movepiece(x1, y1, x2, y2);
 							
 							// ** Check 판단 하고서 만약 check이면 prev를 다시 sq에 먹이기
-
+							
 							selectstate = false;
 							
 							setClickable(true); // 추후 서버 구현 시 턴에 따라 클릭 영역 제한하도록 수정 예정.
