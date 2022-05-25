@@ -18,7 +18,7 @@ public class PlayerInfo extends JPanel {
 		setLayout(null);
 		setBackground(Color.getHSBColor(32/255f, 0, 0.7f));
 		
-		ImageIcon icn = new ImageIcon("src/emo/" + color + (myself ? 'R' : 'L') + ".png");
+		ImageIcon icn = new ImageIcon("emo/" + color + (myself ? 'R' : 'L') + ".png");
 		emoimg = new JLabel(icn);
 		emoimg.setBounds(20, 20, 216, 216);
 		emoimg.setAlignmentX(CENTER_ALIGNMENT);

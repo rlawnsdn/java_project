@@ -50,12 +50,12 @@ class Square extends JPanel {
 		ImageIcon icn;
 		if (this.piece != null && this.piece.type != 'F')
 		{
-			icn = new ImageIcon("src/img/" + this.piece.color + this.piece.type + "_n.png");
+			icn = new ImageIcon("img/" + this.piece.color + this.piece.type + "_n.png");
 			pieceimg = new JLabel(icn);
 		}
 		else
 		{
-			icn = new ImageIcon("src/img/none.png");
+			icn = new ImageIcon("img/none.png");
 			pieceimg = new JLabel(icn);
 		}
 		pieceimg.setBounds(0, 0, 80, 80);
@@ -99,12 +99,12 @@ class Square extends JPanel {
 		ImageIcon icn;
 		if (this.piece != null && this.piece.type != 'F')
 		{
-			icn = new ImageIcon("src/img/" + this.piece.color + this.piece.type + "_n.png");
+			icn = new ImageIcon("img/" + this.piece.color + this.piece.type + "_n.png");
 			pieceimg.setIcon(icn);
 		}
 		else
 		{
-			icn = new ImageIcon("src/img/none.png");
+			icn = new ImageIcon("img/none.png");
 			pieceimg.setIcon(icn);
 		}
 		setBackground(this.color == 'b' ? Color.getHSBColor(32/360f, 0.90f, 0.18f) : Color.getHSBColor(32/360f, 0.23f, 0.84f));
@@ -114,7 +114,7 @@ class Square extends JPanel {
 	{
 		if (movable) {		
 			if (this.piece != null && this.piece.type != 'F') {
-				ImageIcon icn = new ImageIcon("src/img/" + this.piece.color + this.piece.type + "_t.png");
+				ImageIcon icn = new ImageIcon("img/" + this.piece.color + this.piece.type + "_t.png");
 				pieceimg.setIcon(icn);
 			}
 			setBackground(this.color == 'b' ? Color.getHSBColor(100/360f, 0.70f, 0.30f) : Color.getHSBColor(100/360f, 0.55f, 0.45f));
@@ -123,7 +123,7 @@ class Square extends JPanel {
 		{
 			if (this.piece != null && this.piece.type != 'F')
 			{
-				ImageIcon icn = new ImageIcon("src/img/" + this.piece.color + this.piece.type + "_n.png");
+				ImageIcon icn = new ImageIcon("img/" + this.piece.color + this.piece.type + "_n.png");
 				pieceimg.setIcon(icn);
 			}
 			setBackground(this.color == 'b' ? Color.getHSBColor(32/360f, 0.90f, 0.18f) : Color.getHSBColor(32/360f, 0.23f, 0.84f));
@@ -133,7 +133,7 @@ class Square extends JPanel {
 	void showSelectedPiece()
 	{
 		if (this.piece != null && this.piece.type != 'F') {
-			ImageIcon icn = new ImageIcon("src/img/" + this.piece.color + this.piece.type + "_c.png");
+			ImageIcon icn = new ImageIcon("img/" + this.piece.color + this.piece.type + "_c.png");
 			pieceimg.setIcon(icn);
 		}
 		setBackground(this.color == 'b' ? Color.getHSBColor(210/360f, 0.70f, 0.30f) : Color.getHSBColor(210/360f, 0.55f, 0.45f));
@@ -204,7 +204,17 @@ public class ChessBoard extends JFrame {
 							System.out.println("Piece Selected. " + i + "," + j);
 							x1 = i;
 							y1 = j;
-							
+							if (s.piece.color == 'w') { // 캐슬링 가능 여부 최종 확인(킹과 룩 사이 칸들이 공격받지 않아야 한다.)
+								wqc = wk && wr1 && not_attacked(0, 1, 'w') && not_attacked(0, 2, 'w') && not_attacked(0, 3, 'w');
+								wkc = wk && wr2 && not_attacked(0, 5, 'w') && not_attacked(0, 6, 'w');
+							}
+							else {
+								bqc = bk && br1 && not_attacked(7, 1, 'b') && not_attacked(7, 2, 'b') && not_attacked(7, 3, 'b');
+								bkc = bk && br2 && not_attacked(7, 5, 'b') && not_attacked(7, 6, 'b');
+							}
+							System.out.println(not_attacked(7, 5, 'b'));
+							System.out.println(not_attacked(7, 6, 'b'));
+
 							s.piece.findMovables(sq, bqc, bkc, wqc, wkc);
 							
 							s.piece.checkMovables(); // Debug: 콘솔에서 유효이동칸 확인하는 용도로 쓴 후 지우기
@@ -340,6 +350,26 @@ public class ChessBoard extends JFrame {
 			for(int j=0; j<8; j++)
 				if(sq[i][j].piece != null && sq[i][j].piece.type =='F' && sq[i][j].piece.color == (turn%2 == 0 ? 'b':'w'))
 					sq[i][j].piece = null; // 이전 턴에 만든 fake pawn이 있다면, fake pawn을 제거
+	}
+
+	boolean not_attacked(int x, int y, char color) { // 입력된 칸이 'color'의 입장에서 공격받는 상태인지 체크 (color가 흑이면 흑의 입장에서 백에게 공격받는지?)
+		color = color == 'b' ? 'w':'b';
+		for (int i=0; i<8; i++) {
+			for (int j=0; j<8; j++) {
+				if (sq[i][j].piece != null && sq[i][j].piece.color == color && sq[i][j].piece.type != 'F' && sq[i][j].piece.Moveable[x][y] == true) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	void update_moveable() { 
+		for (int i=0; i<8; i++) {
+			for (int j=0; j<8; j++) {
+				sq[i][j].piece.findMovables(sq, bqc, bkc, wqc, wkc);
+			}
+		}
 	}
 	
 

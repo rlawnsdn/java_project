@@ -35,13 +35,13 @@ public class Emotion extends JPanel {
 			btn.addActionListener(new EmoClick(i) {
 				@Override
 				public void actionPerformed (ActionEvent e) {
-					ImageIcon icn = new ImageIcon("src/emo/" + i + "R.png");
+					ImageIcon icn = new ImageIcon("emo/" + i + "R.png");
 					pInfo.emoimg.setIcon(icn);
 				}
 			});
 			emos.add(btn);
 			
-			ImageIcon icn = new ImageIcon("src/emo/x" + i + ".png");
+			ImageIcon icn = new ImageIcon("emo/x" + i + ".png");
 			JLabel lbl = new JLabel(icn);
 			lbl.setBounds(72*(i%3), 72*(i/3), 72, 72);
 			emos.add(lbl);			
