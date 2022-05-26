@@ -7,7 +7,7 @@ public class MainOperation {
 		ChessBoard chessBoard = new ChessBoard();
 		Scanner scn = new Scanner(System.in); // Input for Testing with Console
 		
-		BoardGUI bgui = new BoardGUI(chessBoard);
+		//BoardGUI bgui = new BoardGUI(chessBoard);
 		chessBoard.btnInit();
 		
 		int turncheck = 0;
@@ -31,7 +31,7 @@ public class MainOperation {
 			{
 				System.out.print(""); // chessBoard.turn의 변경이 감지될 때까지 기다리는 부분. 추후 스레드 관련으로 변환 필요.
 			}
-			bgui.updateBoardGUI(chessBoard.sq);
+			//bgui.updateBoardGUI(chessBoard.sq);
 			//chessBoard.update_moveable(); // 턴 종료시마다 모든 기물의 moveable을 업데이트해준다. 
 		}
 	}

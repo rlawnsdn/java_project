@@ -50,12 +50,12 @@ class Square extends JPanel {
 		ImageIcon icn;
 		if (this.piece != null && this.piece.type != 'F')
 		{
-			icn = new ImageIcon("img/" + this.piece.color + this.piece.type + "_n.png");
+			icn = new ImageIcon("src/img/" + this.piece.color + this.piece.type + "_n.png");
 			pieceimg = new JLabel(icn);
 		}
 		else
 		{
-			icn = new ImageIcon("img/none.png");
+			icn = new ImageIcon("src/img/none.png");
 			pieceimg = new JLabel(icn);
 		}
 		pieceimg.setBounds(0, 0, 80, 80);
@@ -99,12 +99,12 @@ class Square extends JPanel {
 		ImageIcon icn;
 		if (this.piece != null && this.piece.type != 'F')
 		{
-			icn = new ImageIcon("img/" + this.piece.color + this.piece.type + "_n.png");
+			icn = new ImageIcon("src/img/" + this.piece.color + this.piece.type + "_n.png");
 			pieceimg.setIcon(icn);
 		}
 		else
 		{
-			icn = new ImageIcon("img/none.png");
+			icn = new ImageIcon("src/img/none.png");
 			pieceimg.setIcon(icn);
 		}
 		setBackground(this.color == 'b' ? Color.getHSBColor(32/360f, 0.90f, 0.18f) : Color.getHSBColor(32/360f, 0.23f, 0.84f));
@@ -114,7 +114,7 @@ class Square extends JPanel {
 	{
 		if (movable) {		
 			if (this.piece != null && this.piece.type != 'F') {
-				ImageIcon icn = new ImageIcon("img/" + this.piece.color + this.piece.type + "_t.png");
+				ImageIcon icn = new ImageIcon("src/img/" + this.piece.color + this.piece.type + "_t.png");
 				pieceimg.setIcon(icn);
 			}
 			setBackground(this.color == 'b' ? Color.getHSBColor(100/360f, 0.70f, 0.30f) : Color.getHSBColor(100/360f, 0.55f, 0.45f));
@@ -123,7 +123,7 @@ class Square extends JPanel {
 		{
 			if (this.piece != null && this.piece.type != 'F')
 			{
-				ImageIcon icn = new ImageIcon("img/" + this.piece.color + this.piece.type + "_n.png");
+				ImageIcon icn = new ImageIcon("src/img/" + this.piece.color + this.piece.type + "_n.png");
 				pieceimg.setIcon(icn);
 			}
 			setBackground(this.color == 'b' ? Color.getHSBColor(32/360f, 0.90f, 0.18f) : Color.getHSBColor(32/360f, 0.23f, 0.84f));
@@ -133,7 +133,7 @@ class Square extends JPanel {
 	void showSelectedPiece()
 	{
 		if (this.piece != null && this.piece.type != 'F') {
-			ImageIcon icn = new ImageIcon("img/" + this.piece.color + this.piece.type + "_c.png");
+			ImageIcon icn = new ImageIcon("src/img/" + this.piece.color + this.piece.type + "_c.png");
 			pieceimg.setIcon(icn);
 		}
 		setBackground(this.color == 'b' ? Color.getHSBColor(210/360f, 0.70f, 0.30f) : Color.getHSBColor(210/360f, 0.55f, 0.45f));
@@ -165,6 +165,8 @@ public class ChessBoard extends JFrame {
 		this.gameEnds = false;
 		
 		this.selectstate = false;
+		
+		btnInit();
 	}
 	
 	void printBoard() { // Test with Console before implementing GUI
@@ -200,10 +202,13 @@ public class ChessBoard extends JFrame {
 				sq[i][j].btn.addActionListener(new SquareClick(i, j, sq[i][j]) {
 					@Override
 					public void actionPerformed (ActionEvent e) {
+						
+						System.out.println("Button Clicked. " + i + "," + j);
 						if (!selectstate || (s.piece != null && s.piece.color == (turn%2 == 0 ? 'w' : 'b'))) {
 							System.out.println("Piece Selected. " + i + "," + j);
 							x1 = i;
 							y1 = j;
+							
 							if (s.piece.color == 'w') { // 캐슬링 가능 여부 최종 확인(킹과 룩 사이 칸들이 공격받지 않아야 한다.)
 								wqc = wk && wr1 && not_attacked(0, 1, 'w') && not_attacked(0, 2, 'w') && not_attacked(0, 3, 'w');
 								wkc = wk && wr2 && not_attacked(0, 5, 'w') && not_attacked(0, 6, 'w');
@@ -212,6 +217,7 @@ public class ChessBoard extends JFrame {
 								bqc = bk && br1 && not_attacked(7, 1, 'b') && not_attacked(7, 2, 'b') && not_attacked(7, 3, 'b');
 								bkc = bk && br2 && not_attacked(7, 5, 'b') && not_attacked(7, 6, 'b');
 							}
+							
 							System.out.println(not_attacked(7, 5, 'b'));
 							System.out.println(not_attacked(7, 6, 'b'));
 
@@ -236,7 +242,7 @@ public class ChessBoard extends JFrame {
 							
 							selectstate = false;
 							
-							setClickable(true); // 추후 서버 구현 시 턴에 따라 클릭 영역 제한하도록 수정 예정.
+							setClickable(false); // 추후 서버 구현 시 턴에 따라 클릭 영역 제한하도록 수정 예정.
 							turn++;
 						}
 					}
@@ -371,9 +377,4 @@ public class ChessBoard extends JFrame {
 			}
 		}
 	}
-	
-
-
-
-
 }

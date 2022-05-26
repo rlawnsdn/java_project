@@ -17,8 +17,8 @@ public class BoardGUI {
 	BoardFrame bframe;
 	ChessBoard cboard;
 	
-	BoardGUI(ChessBoard cb) {
-		bframe = new BoardFrame(cb.sq);
+	BoardGUI(ChessBoard cb, boolean white) {
+		bframe = new BoardFrame(cb.sq, white);
 		cboard = cb;
 	}
 	
@@ -36,11 +36,11 @@ public class BoardGUI {
 
 class BoardFrame extends JFrame {
 	
-	BoardFrame(Square[][] sq) {
+	BoardFrame(Square[][] sq, boolean white) {
 		setTitle("Chess");
 		
-		PlayerInfo player1 = new PlayerInfo(true, 'w');
-		PlayerInfo player2 = new PlayerInfo(false, 'b');
+		PlayerInfo player1 = new PlayerInfo(true, white ? 'w':'b');
+		PlayerInfo player2 = new PlayerInfo(false, white ? 'b':'w');
 		JPanel chessboard = new JPanel();
 		
 		chessboard.setBounds(320, 64, 640, 640);
@@ -50,7 +50,7 @@ class BoardFrame extends JFrame {
 		
 		for (int i=7; i>=0; i--)
 			for (int j=0; j<8; j++)
-				chessboard.add(sq[i][j]);
+				chessboard.add(white ? sq[i][j] : sq[7-i][7-j]);
 		
 		Container c = getContentPane();
 		setResizable(false);
