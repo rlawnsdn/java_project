@@ -1,9 +1,5 @@
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -149,6 +145,9 @@ public class ChessBoard extends JFrame {
 	boolean wkc, wqc, bkc, bqc; //캐슬링 가능여부
 	
 	boolean selectstate; // false: 기물 선택, true: 위치 선택
+	boolean playsWhite;
+	
+	char preferredPromotion;
 	
 	int x1, y1, x2, y2;
 
@@ -165,6 +164,8 @@ public class ChessBoard extends JFrame {
 		this.gameEnds = false;
 		
 		this.selectstate = false;
+		
+		this.preferredPromotion = 'Q';
 		
 		btnInit();
 	}
@@ -203,23 +204,16 @@ public class ChessBoard extends JFrame {
 					@Override
 					public void actionPerformed (ActionEvent e) {
 						
+						if ((turn%2 == 0) != playsWhite) return;
+						
 						System.out.println("Button Clicked. " + i + "," + j);
 						if (!selectstate || (s.piece != null && s.piece.color == (turn%2 == 0 ? 'w' : 'b'))) {
 							System.out.println("Piece Selected. " + i + "," + j);
 							x1 = i;
 							y1 = j;
 							
-							if (s.piece.color == 'w') { // 캐슬링 가능 여부 최종 확인(킹과 룩 사이 칸들이 공격받지 않아야 한다.)
-								wqc = wk && wr1 && not_attacked(0, 1, 'w') && not_attacked(0, 2, 'w') && not_attacked(0, 3, 'w');
-								wkc = wk && wr2 && not_attacked(0, 5, 'w') && not_attacked(0, 6, 'w');
-							}
-							else {
-								bqc = bk && br1 && not_attacked(7, 1, 'b') && not_attacked(7, 2, 'b') && not_attacked(7, 3, 'b');
-								bkc = bk && br2 && not_attacked(7, 5, 'b') && not_attacked(7, 6, 'b');
-							}
-							
-							System.out.println(not_attacked(7, 5, 'b'));
-							System.out.println(not_attacked(7, 6, 'b'));
+							System.out.println(notAttacked(7, 5, 'b'));
+							System.out.println(notAttacked(7, 6, 'b'));
 
 							s.piece.findMovables(sq, bqc, bkc, wqc, wkc);
 							
@@ -242,6 +236,7 @@ public class ChessBoard extends JFrame {
 							
 							selectstate = false;
 							
+							updateMovableForAllPieces();
 							setClickable(false); // 추후 서버 구현 시 턴에 따라 클릭 영역 제한하도록 수정 예정.
 							turn++;
 						}
@@ -358,7 +353,7 @@ public class ChessBoard extends JFrame {
 					sq[i][j].piece = null; // 이전 턴에 만든 fake pawn이 있다면, fake pawn을 제거
 	}
 
-	boolean not_attacked(int x, int y, char color) { // 입력된 칸이 'color'의 입장에서 공격받는 상태인지 체크 (color가 흑이면 흑의 입장에서 백에게 공격받는지?)
+	boolean notAttacked(int x, int y, char color) { // 입력된 칸이 'color'의 입장에서 공격받는 상태인지 체크 (color가 흑이면 흑의 입장에서 백에게 공격받는지?)
 		color = color == 'b' ? 'w':'b';
 		for (int i=0; i<8; i++) {
 			for (int j=0; j<8; j++) {
@@ -370,11 +365,18 @@ public class ChessBoard extends JFrame {
 		return true;
 	}
 
-	void update_moveable() { 
+	void updateMovableForAllPieces() { 
 		for (int i=0; i<8; i++) {
 			for (int j=0; j<8; j++) {
-				sq[i][j].piece.findMovables(sq, bqc, bkc, wqc, wkc);
+				if (sq[i][j].piece != null)
+					sq[i][j].piece.findMovables(sq, bqc, bkc, wqc, wkc);
 			}
 		}
+		
+		// 캐슬링 가능 여부 최종 확인(킹과 룩 사이 칸들이 공격받지 않아야 한다.)
+		wqc &= wk && wr1 && notAttacked(0, 1, 'w') && notAttacked(0, 2, 'w') && notAttacked(0, 3, 'w');
+		wkc &= wk && wr2 && notAttacked(0, 5, 'w') && notAttacked(0, 6, 'w');
+		bqc &= bk && br1 && notAttacked(7, 1, 'b') && notAttacked(7, 2, 'b') && notAttacked(7, 3, 'b');
+		bkc &= bk && br2 && notAttacked(7, 5, 'b') && notAttacked(7, 6, 'b');
 	}
 }

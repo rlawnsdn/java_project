@@ -1,15 +1,10 @@
 import java.awt.Color;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class BoardGUI {
@@ -17,8 +12,12 @@ public class BoardGUI {
 	BoardFrame bframe;
 	ChessBoard cboard;
 	
-	BoardGUI(ChessBoard cb, boolean white) {
-		bframe = new BoardFrame(cb.sq, white);
+	BoardGUI() {
+		bframe = new BoardFrame();
+	}
+	
+	void startBoardGUI(ChessBoard cb, boolean white) {
+		bframe.startBoardFrame(cb, white);
 		cboard = cb;
 	}
 	
@@ -36,21 +35,18 @@ public class BoardGUI {
 
 class BoardFrame extends JFrame {
 	
-	BoardFrame(Square[][] sq, boolean white) {
+	PlayerInfo player1;
+	PlayerInfo player2;
+	JPanel chessboard;
+	
+	Emotion emo;
+	JPanel promotion;
+	
+	BoardFrame() {
 		setTitle("Chess");
 		
-		PlayerInfo player1 = new PlayerInfo(true, white ? 'w':'b');
-		PlayerInfo player2 = new PlayerInfo(false, white ? 'b':'w');
-		JPanel chessboard = new JPanel();
-		
-		chessboard.setBounds(320, 64, 640, 640);
-		chessboard.setAlignmentX(CENTER_ALIGNMENT);
-		chessboard.setAlignmentY(CENTER_ALIGNMENT);
-		chessboard.setLayout(new GridLayout(8,8));
-		
-		for (int i=7; i>=0; i--)
-			for (int j=0; j<8; j++)
-				chessboard.add(white ? sq[i][j] : sq[7-i][7-j]);
+		player1 = new PlayerInfo(true);
+		player2 = new PlayerInfo(false);
 		
 		Container c = getContentPane();
 		setResizable(false);
@@ -59,17 +55,45 @@ class BoardFrame extends JFrame {
 		c.setLayout(null);
 		
 		c.add(player2);
-		c.add(chessboard);
 		c.add(player1);
 		
-		Emotion emo = new Emotion(player1);
+		emo = new Emotion(player1);
 		c.add(emo);
 		
 		//setUndecorated(true); // SetSize가 의도대로 동작하지 않아 타이틀바 제거.
 		pack();
 
-		setSize(1280, 800);
+		setSize(1296, 800); // 1280 * 768
 		setLocationRelativeTo(null);
+		setVisible(true);
+	}
+	
+	void startBoardFrame(ChessBoard cb, boolean white) {
+		setTitle("Chess");
+		
+		player1.updatePlayerInfo(true, white ? 'w':'b');
+		player2.updatePlayerInfo(false, white ? 'b':'w');
+		
+		chessboard = new JPanel();
+		
+		chessboard.setBounds(320, 64, 640, 640);
+		chessboard.setAlignmentX(CENTER_ALIGNMENT);
+		chessboard.setAlignmentY(CENTER_ALIGNMENT);
+		chessboard.setLayout(new GridLayout(8,8));
+		
+		for (int i=7; i>=0; i--)
+			for (int j=0; j<8; j++)
+				chessboard.add(white ? cb.sq[i][j] : cb.sq[7-i][7-j]);
+
+		Container c = getContentPane();
+		setResizable(false);
+		
+		c.add(chessboard);
+		
+		promotion = new Promotion(cb);
+		c.add(promotion);
+		
+		repaint();
 		setVisible(true);
 	}
 }

@@ -1,10 +1,7 @@
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -56,7 +53,7 @@ public class Emotion extends JPanel {
 
 class EmoClick implements ActionListener{
 	
-    final int i;;
+    final int i;
     
     EmoClick(int i){
         this.i = i;

@@ -1,7 +1,5 @@
 import java.io.*;
 import java.net.*;
-import java.text.*;
-import java.util.*;
 
 public class CommThread extends Thread {
 	

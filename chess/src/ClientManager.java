@@ -1,6 +1,5 @@
 import java.io.*;
 import java.net.Socket;
-import java.util.Scanner;
 
 class PlayerClient extends Thread {
 	
@@ -17,13 +16,13 @@ class PlayerClient extends Thread {
 	PlayerClient() {
 		this.im = new InputManager();
 		
-		this.cboard = new ChessBoard();
 		gameStarted = false;
+		this.cboard = new ChessBoard();
+		this.bgui = new BoardGUI();
 	}
 	
 	public void run() {
-		
-		Scanner scn = new Scanner(System.in);
+
 		try {
 			Socket soc = new Socket("localhost", 5000);
 			DataInputStream dis = new DataInputStream(soc.getInputStream());
@@ -32,19 +31,17 @@ class PlayerClient extends Thread {
 				System.out.println(str);
 				if (str.equals("GameStart 1")) {
 					gameStarted = true;
+					cboard.playsWhite = true;
 					cboard.setClickable(true);
-					bgui = new BoardGUI(cboard, true);
+					bgui.startBoardGUI(cboard, true);
 					this.myturn = true;
-					//im.setTurn(true);
-					//im.start();
 				}
 				else if (str.equals("GameStart 2")) {
 					gameStarted = true;
+					cboard.playsWhite = false;
 					cboard.setClickable(false);
-					bgui = new BoardGUI(cboard, false);
+					bgui.startBoardGUI(cboard, false);
 					this.myturn = false;
-					//im.setTurn(false);
-					//im.start();
 				}
 			}
 			
@@ -80,7 +77,7 @@ class PlayerClient extends Thread {
 				
 				send(soc, "Moves:" + cboard.x1 + cboard.y1 + cboard.x2 + cboard.y2);
 				System.out.println("sended... Moves:" + cboard.x1 + cboard.y1 + cboard.x2 + cboard.y2);
-				//cboard.movepiece(cboard.x1, cboard.y1, cboard.x2, cboard.y2);
+				cboard.setClickable(false);
 				bgui.updateBoardGUI(cboard.sq);
 				myturn ^= true;
 			}

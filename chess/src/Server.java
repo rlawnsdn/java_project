@@ -59,6 +59,8 @@ public class Server {
 				e.printStackTrace();
 			}
 		}
+		
+		//ss.close();
 	}
 
 	/*
