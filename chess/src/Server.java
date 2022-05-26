@@ -6,6 +6,7 @@ import java.util.*;
 public class Server {
 	
 	private static CommThread[] playerclient = new CommThread[2];
+	private static EmoThread[] playeremo = new EmoThread[2];
 	private static SimpleDateFormat sdfDate = new SimpleDateFormat("yyy-MM-dd HH:mm:SSS");
 
 	public static String getLog (String msg) {
@@ -30,7 +31,7 @@ public class Server {
 		while (true) {
 			try {
 				Socket soc = ss.accept();
-				System.out.println(Server.getLog("new connection arrived"));
+				System.out.println(Server.getLog("new player connection arrived"));
 				CommThread t = new CommThread(soc, players+1);
 				playerclient[players++] = t; 
 
@@ -47,12 +48,34 @@ public class Server {
 		playerclient[1].start();
 		System.out.println(Server.getLog("2 clients are here"));
 		
+		players = 0;
 		while (true) {
+			try {
+				Socket soc = ss.accept();
+				System.out.println(Server.getLog("new emo connection arrived"));
+				EmoThread t = new EmoThread(soc, players+1);
+				playeremo[players++] = t;
 
+				if (players == 2) { // The server has two player clients, start game.
+					break;
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		playeremo[0].start();
+		playeremo[1].start();
+		
+		ServerEmoManager sem = new ServerEmoManager(playeremo);
+		sem.start();
+		
+		while (true) {
 			try {
 				if (white) 	receiveAndSend(playerclient[0], playerclient[1]);
 				else		receiveAndSend(playerclient[1], playerclient[0]);
-				System.out.println(Server.getLog("Received from client and sened to another"));
+				System.out.println(Server.getLog("Received from client and sent to another"));
 				white ^= true;
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -62,37 +85,6 @@ public class Server {
 		
 		//ss.close();
 	}
-
-	/*
-	public void run() {
-		ServerSocket ss = null;
-		try {
-			ss = new ServerSocket(5000);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		Scanner scn = new Scanner(System.in);
-		
-		Socket soc = null;
-		OutputStream out = null;
-		try {
-			soc = ss.accept();
-			System.out.println(ServerThread.getLog("new connection arrived"));
-			out = soc.getOutputStream();
-			DataOutputStream dos = new DataOutputStream(out);
-			while (true) {
-				receive(soc, dos);
-				//dos.writeUTF(scn.nextLine());
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		scn.close();
-		
-	}
-	*/
 	
     public static void receiveAndSend(CommThread comm1, CommThread comm2) throws IOException {
     	
@@ -140,6 +132,61 @@ public class Server {
             //if (i.length() < 1) return;
             comm2.sendToClient("I said... " + i);
 			comm1.sendToClient("Opponent said... " + i);
+        }
+    }
+    
+    public static <T> T toObject (byte[] bytes, Class<T> type)
+    {
+        Object obj = null;
+        try {
+            ByteArrayInputStream bis = new ByteArrayInputStream (bytes);
+            ObjectInputStream ois = new ObjectInputStream (bis);
+            obj = ois.readObject();
+        }
+        catch (IOException ex) {
+            //TODO: Handle the exception
+        }
+        catch (ClassNotFoundException ex) {
+            //TODO: Handle the exception
+        }
+        return type.cast(obj);
+    }
+}
+
+class ServerEmoManager extends Thread {
+	
+	EmoThread[] playeremo;
+	
+	ServerEmoManager(EmoThread[] emo) {
+		this.playeremo = emo;
+	}
+	
+	public void run() {
+		
+		while (true) {
+			try {
+				receiveAndSend(playeremo[0], playeremo[1]);
+				receiveAndSend(playeremo[1], playeremo[0]);
+				System.out.println(Server.getLog("Emo Received from client and sent to another"));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+	}
+	
+    public static void receiveAndSend(EmoThread emo1, EmoThread emo2) throws IOException {
+    	
+    	Socket socket1 = emo1.soc;
+        int maxBufferSize1 = 1024;
+        byte[] recvBuffer1 = new byte[maxBufferSize1];
+        InputStream is1 = socket1.getInputStream();
+        int nReadSize1 = is1.read(recvBuffer1);    
+
+        if (nReadSize1 > 0) {
+            String i = toObject(recvBuffer1, String.class);
+			emo2.sendToClient(i);
         }
     }
     

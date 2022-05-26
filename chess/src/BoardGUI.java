@@ -4,7 +4,10 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class BoardGUI {
@@ -28,6 +31,38 @@ public class BoardGUI {
 			for (int j=0; j<8; j++) {
 				this.cboard.sq[i][j].updatePanel();
 				this.cboard.sq[i][j].updatePiecePosition();
+			}
+		}
+	}
+	
+	void updateEmo(boolean myself, int s) {
+		
+		if (s < 0) {
+			if (myself) {
+				ImageIcon icn = new ImageIcon("src/emo/" + (cboard.playsWhite ? 'w':'b') + "R.png");
+				//ImageIcon icn = new ImageIcon("emo/" + (cboard.playsWhite ? 'w':'b') + "R.png");
+				bframe.player1.emoidx = s;
+				bframe.player1.emoimg.setIcon(icn);
+			}
+			else {
+				ImageIcon icn = new ImageIcon("src/emo/" + (cboard.playsWhite ? 'b':'w') + "L.png");
+				//ImageIcon icn = new ImageIcon("emo/" + (cboard.playsWhite ? 'b':'w') + "L.png");
+				bframe.player2.emoidx = s;
+				bframe.player2.emoimg.setIcon(icn);
+			}
+		}
+		else {
+			if (myself) {
+				ImageIcon icn = new ImageIcon("src/emo/" + s + "R.png");
+				//ImageIcon icn = new ImageIcon("emo/" + s + "R.png");
+				bframe.player1.emoidx = s;
+				bframe.player1.emoimg.setIcon(icn);
+			}
+			else {
+				ImageIcon icn = new ImageIcon("src/emo/" + s + "L.png");
+				//ImageIcon icn = new ImageIcon("emo/" + s + "L.png");
+				bframe.player2.emoidx = s;
+				bframe.player2.emoimg.setIcon(icn);
 			}
 		}
 	}
@@ -107,6 +142,175 @@ class SquareClick implements ActionListener{
         this.i = i;
         this.j = j;
         this.s = s;
+    }
+    
+	public void actionPerformed (ActionEvent e) {
+
+	}
+}
+
+class PlayerInfo extends JPanel {
+
+	boolean myself;
+	JLabel emoimg;
+	int emoidx;
+	
+	PlayerInfo(boolean myself) {
+		
+		this.myself = true;
+		
+		if (myself) setBounds(1024, 384, 256, 384);
+		else setBounds(0, 0, 256, 384);
+		setLayout(null);
+		setBackground(Color.getHSBColor(32/255f, 0, 0.7f));
+		
+		ImageIcon icn = new ImageIcon("src/emo/p" + (myself ? 'R' : 'L') + ".png");
+		emoimg = new JLabel(icn);
+		emoimg.setBounds(20, 20, 216, 216);
+		emoimg.setAlignmentX(CENTER_ALIGNMENT);
+		emoimg.setAlignmentY(CENTER_ALIGNMENT);
+		
+		this.add(emoimg);
+		this.emoidx = -1;
+	}
+	
+	void updatePlayerInfo(boolean myself, char color) {
+		
+		this.myself = true;
+		
+		if (myself) setBounds(1024, 384, 256, 384);
+		else setBounds(0, 0, 256, 384);
+		setLayout(null);
+		setBackground(Color.getHSBColor(32/255f, 0, 0.7f));
+		
+		ImageIcon icn = new ImageIcon("src/emo/" + color + (myself ? 'R' : 'L') + ".png");
+		emoimg.setIcon(icn);
+		emoimg.setBounds(20, 20, 216, 216);
+		emoimg.setAlignmentX(CENTER_ALIGNMENT);
+		emoimg.setAlignmentY(CENTER_ALIGNMENT);
+	}
+}
+
+class Emotion extends JPanel {
+
+	PlayerInfo pInfo;
+	
+	Emotion(PlayerInfo p) {
+		
+		this.pInfo = p;
+		
+		setBounds(1024, 200, 256, 184);
+		setLayout(null);
+		setBackground(Color.getHSBColor(32/255f, 0, 0.5f));
+		
+		JPanel emos = new JPanel();
+		emos.setBounds(20, 20, 216, 144);
+		emos.setLayout(null);
+		
+		for (int i=0; i<6; i++)
+		{
+			JButton btn = new JButton();
+			btn.setBounds(72*(i%3), 72*(i/3), 72, 72);
+			//btn.setOpaque(false);
+			btn.setContentAreaFilled(false);
+			btn.addActionListener(new EmoClick(i) {
+				@Override
+				public void actionPerformed (ActionEvent e) {
+					ImageIcon icn = new ImageIcon("src/emo/" + i + "R.png");
+					//ImageIcon icn = new ImageIcon("emo/" + i + "R.png");
+					pInfo.emoimg.setIcon(icn);
+					pInfo.emoidx = i;
+				}
+			});
+			emos.add(btn);
+			
+			ImageIcon icn = new ImageIcon("src/emo/x" + i + ".png");
+			//ImageIcon icn = new ImageIcon("emo/x" + i + ".png");
+			JLabel lbl = new JLabel(icn);
+			lbl.setBounds(72*(i%3), 72*(i/3), 72, 72);
+			emos.add(lbl);			
+
+		}
+		
+		this.add(emos);
+	}
+}
+
+class EmoClick implements ActionListener{
+	
+    final int i;
+    
+    EmoClick(int i){
+        this.i = i;
+    }
+    
+	public void actionPerformed (ActionEvent e) {
+
+	}
+}
+
+class Promotion extends JPanel {
+
+	ChessBoard chessBoard;
+	JLabel[] lbl;
+	
+	Promotion(ChessBoard cb) {
+		
+		this.chessBoard = cb;
+		lbl = new JLabel[4];
+		
+		setBounds(1024, 56, 256, 144);
+		setLayout(null);
+		setBackground(Color.getHSBColor(32/255f, 0, 0.3f));
+		
+		JPanel promos = new JPanel();
+		promos.setBounds(20, 20, 216, 104);
+		promos.setLayout(null);
+		
+		char[] pchar = {'Q', 'N', 'B', 'R'};
+		for (int i=0; i<4; i++)
+		{
+			JButton btn = new JButton();
+			btn.setBounds(108*(i%2), 54*(i/2), 108, 54);
+			btn.setContentAreaFilled(false);
+			btn.addActionListener(new PromoClick(i, pchar[i]) {
+				@Override
+				public void actionPerformed (ActionEvent e) {
+					chessBoard.preferredPromotion = p;
+					updatePromoGUI(i, (cb.playsWhite ? 'w':'b'));
+				}
+			});
+			promos.add(btn);
+			
+			ImageIcon icn = new ImageIcon("src/prmt/" + (cb.playsWhite ? 'w':'b') + pchar[i]
+					+ (cb.preferredPromotion == pchar[i] ? "_c.png" : "_n.png"));
+			//ImageIcon icn = new ImageIcon("prmt/" + (cb.playsWhite ? 'w':'b') + pchar[i]
+			//+ (cb.preferredPromotion == pchar[i] ? "_c.png" : "_n.png"));
+			lbl[i] = new JLabel(icn);
+			lbl[i].setBounds(108*(i%2), 54*(i/2), 108, 54);
+			promos.add(lbl[i]);			
+
+		}
+		
+		this.add(promos);
+	}
+	
+	void updatePromoGUI(int idx, char c) {
+		char[] pchar = {'Q', 'N', 'B', 'R'};
+		for (int i=0; i<4; i++) {
+			lbl[i].setIcon(new ImageIcon("src/prmt/" + c + pchar[i] + (i==idx ? "_c.png" : "_n.png")));
+		}
+	}
+}
+
+class PromoClick implements ActionListener{
+	
+	final int i;
+    final char p;
+    
+    PromoClick(int i, char p){
+    	this.i = i;
+        this.p = p;
     }
     
 	public void actionPerformed (ActionEvent e) {
