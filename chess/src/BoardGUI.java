@@ -65,10 +65,10 @@ class BoardFrame extends JFrame {
 		Emotion emo = new Emotion(player1);
 		c.add(emo);
 		
-		setUndecorated(true); // SetSize가 의도대로 동작하지 않아 타이틀바 제거.
+		//setUndecorated(true); // SetSize가 의도대로 동작하지 않아 타이틀바 제거.
 		pack();
 
-		setSize(1280, 768);
+		setSize(1280, 800);
 		setLocationRelativeTo(null);
 		setVisible(true);
 	}
