@@ -65,7 +65,8 @@ class PlayerClient extends Thread {
 				}
 				else if (str.startsWith("Moves:")) {
 					char[] c = str.substring(6).toCharArray();
-					cboard.movepiece(c[0]-48, c[1]-48, c[2]-48, c[3]-48);
+					cboard.movepiece(c[0]-48, c[1]-48, c[2]-48, c[3]-48, c[4]);
+					cboard.updateMovableForAllPieces();
 					cboard.turn++;
 					cboard.setClickable(true);
 					bgui.updateBoardGUI(cboard.sq);
@@ -78,8 +79,8 @@ class PlayerClient extends Thread {
 					PlayerClient.sleep(50);
 				}
 				
-				send(soc, "Moves:" + cboard.x1 + cboard.y1 + cboard.x2 + cboard.y2);
-				System.out.println("sended... Moves:" + cboard.x1 + cboard.y1 + cboard.x2 + cboard.y2);
+				send(soc, "Moves:" + cboard.x1 + cboard.y1 + cboard.x2 + cboard.y2 + cboard.preferredPromotion);
+				System.out.println("sended... Moves:" + cboard.x1 + cboard.y1 + cboard.x2 + cboard.y2 + cboard.preferredPromotion);
 				cboard.setClickable(false);
 				bgui.updateBoardGUI(cboard.sq);
 				myturn ^= true;

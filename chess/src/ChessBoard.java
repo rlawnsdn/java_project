@@ -79,7 +79,16 @@ class Square extends JPanel {
 		this.clickable = s.clickable;
 		
 		this.color = s.color;
-		this.piece = s.piece;
+		if (s.piece == null)
+			this.piece = null;
+		switch (s.piece.type) {
+			case 'P': this.piece = new Pawn(s.piece.pos_x, s.piece.pos_y, s.piece.color);	break;
+			case 'K': this.piece = new King(s.piece.pos_x, s.piece.pos_y, s.piece.color); break;
+			case 'Q': this.piece = new Queen(s.piece.pos_x, s.piece.pos_y, s.piece.color); break;
+			case 'R': this.piece = new Rook(s.piece.pos_x, s.piece.pos_y, s.piece.color); break;
+			case 'B': this.piece = new Bishop(s.piece.pos_x, s.piece.pos_y, s.piece.color); break;
+			case 'N': this.piece = new Knight(s.piece.pos_x, s.piece.pos_y, s.piece.color); break;
+		}
 	}
 	
 	void updatePiecePosition()
@@ -147,6 +156,8 @@ public class ChessBoard extends JFrame {
 	boolean selectstate; // false: 기물 선택, true: 위치 선택
 	boolean playsWhite;
 	
+	Piece wKing, bKing;
+	
 	char preferredPromotion;
 	
 	int x1, y1, x2, y2;
@@ -157,6 +168,9 @@ public class ChessBoard extends JFrame {
 		for (int i=0; i<8; i++)
 			for (int j=0; j<8; j++)
 				sq[i][j] = new Square(i, j);
+		
+		wKing = sq[0][4].piece;
+		bKing = sq[7][4].piece;
 		
 		this.turn = 0;
 		this.wr1 = true; this.wr2 = true; this.wk = true; this.br1 = true; this.br2 = true; this.bk = true;
@@ -207,7 +221,7 @@ public class ChessBoard extends JFrame {
 						if ((turn%2 == 0) != playsWhite) return;
 						
 						System.out.println("Button Clicked. " + i + "," + j);
-						if (!selectstate || (s.piece != null && s.piece.color == (turn%2 == 0 ? 'w' : 'b'))) {
+						if (s.piece != null && s.piece.color == (turn%2 == 0 ? 'w' : 'b')) {
 							System.out.println("Piece Selected. " + i + "," + j);
 							x1 = i;
 							y1 = j;
@@ -217,33 +231,57 @@ public class ChessBoard extends JFrame {
 
 							s.piece.findMovables(sq, bqc, bkc, wqc, wkc);
 							
+							System.out.println(notAttacked(7, 5, 'b'));
+							System.out.println(notAttacked(7, 6, 'b'));
+							
+							if (s.piece.type == 'K')
+								updateMovableForAllPieces();
+							
+							System.out.println(notAttacked(7, 5, 'b'));
+							System.out.println(notAttacked(7, 6, 'b'));
+
+							
 							s.piece.checkMovables(); // Debug: 콘솔에서 유효이동칸 확인하는 용도로 쓴 후 지우기
 							selectstate = true;
 							
 							setClickable(s.piece.Moveable);
 							s.showSelectedPiece();
 						}
-						else if (sq[i][j].clickable) {
+						else if (selectstate && sq[i][j].clickable) {
 							
 							Square[][] prev = copyBoard(sq); // 현재 board 상태 저장
 							
 							System.out.println("Square Selected. " + i + "," + j);
 							x2 = i;
 							y2 = j;
-							movepiece(x1, y1, x2, y2);
+							movepiece(x1, y1, x2, y2, preferredPromotion);
+							
+							selectstate = false;		
+							updateMovableForAllPieces();
 							
 							// ** Check 판단 하고서 만약 check이면 prev를 다시 sq에 먹이기
-							
-							selectstate = false;
-							
-							updateMovableForAllPieces();
-							setClickable(false); // 추후 서버 구현 시 턴에 따라 클릭 영역 제한하도록 수정 예정.
-							turn++;
+							if (checkCheck((turn%2 == 0 ? wKing : bKing), (turn%2 == 0 ? 'w' : 'b')))
+							{
+								//wk, rk 등 변수 되돌릴 방법 생각해봐야
+								System.out.println("Checked!!");
+								sq = prev;
+								cancelSelections();
+								setClickable(true);
+							}
+							else {
+								setClickable(false);
+								turn++;
+							}
 						}
 					}
 				});
 			}
 		}
+	}
+	
+	boolean checkCheck(Piece king, char c) {
+		
+		return !notAttacked(king.pos_x, king.pos_y, c);
 	}
 	
 	void setClickable(boolean[][] mov) { // 버튼 활성화 여부 결정
@@ -253,7 +291,14 @@ public class ChessBoard extends JFrame {
 				sq[i][j].clickable = mov[i][j];
 				sq[i][j].showMovable(mov[i][j]);
 			}
-
+	}
+	
+	void cancelSelections() { // 선택 해제
+		
+		for (int i=7; i>=0; i--)
+			for (int j=0; j<8; j++) {
+				sq[i][j].updatePanel();
+			}
 	}
 	
 	void setClickable(boolean clk) { // 버튼 활성화 여부 결정 (일괄)
@@ -269,7 +314,7 @@ public class ChessBoard extends JFrame {
 	}
 	
 
-	void movepiece(int x1, int y1, int x2, int y2){ //(x1, y1)에서 (x2, y2)로 이동할 때
+	void movepiece(int x1, int y1, int x2, int y2, char pref){ //(x1, y1)에서 (x2, y2)로 이동할 때
 		
 		if(sq[x1][y1].piece.type=='K'){
 			
@@ -321,7 +366,7 @@ public class ChessBoard extends JFrame {
 			sq[x2][y2].piece = sq[x1][y1].piece;
 			sq[x1][y1].piece = null;
 		}
-		else if(sq[x1][y1].piece.type=='P'){ //앙파상
+		else if(sq[x1][y1].piece.type=='P'){ //앙파상 & 프로모션
 			if (Math.abs(x1 - x2) == 2){
 				if (x1 < x2){
 					sq[x1+1][y1].piece = new Pawn(x1+1, y1, sq[x1][y1].piece.color);
@@ -341,6 +386,23 @@ public class ChessBoard extends JFrame {
 			
 			sq[x2][y2].piece = sq[x1][y1].piece;
 			sq[x1][y1].piece = null;
+			
+			if (sq[x2][y2].piece.color == 'b' && x2 == 0) {
+				switch (pref) {
+				case 'Q':	sq[x2][y2].piece = new Queen(x2, y2, 'b'); 		break;
+				case 'N':	sq[x2][y2].piece = new Knight(x2, y2, 'b'); 	break;
+				case 'B': 	sq[x2][y2].piece = new Bishop(x2, y2, 'b'); 	break;
+				case 'R':	sq[x2][y2].piece = new Rook(x2, y2, 'b');		break;
+				}
+			}
+			else if (sq[x2][y2].piece.color == 'w' && x2 == 7) {
+				switch (pref) {
+				case 'Q':	sq[x2][y2].piece = new Queen(x2, y2, 'w'); 		break;
+				case 'N':	sq[x2][y2].piece = new Knight(x2, y2, 'w'); 	break;
+				case 'B': 	sq[x2][y2].piece = new Bishop(x2, y2, 'w'); 	break;
+				case 'R':	sq[x2][y2].piece = new Rook(x2, y2, 'w');		break;
+				}
+			}
 		}
 		else{ //평범한 이동
 			sq[x2][y2].piece = sq[x1][y1].piece;
@@ -374,9 +436,9 @@ public class ChessBoard extends JFrame {
 		}
 		
 		// 캐슬링 가능 여부 최종 확인(킹과 룩 사이 칸들이 공격받지 않아야 한다.)
-		wqc &= wk && wr1 && notAttacked(0, 1, 'w') && notAttacked(0, 2, 'w') && notAttacked(0, 3, 'w');
-		wkc &= wk && wr2 && notAttacked(0, 5, 'w') && notAttacked(0, 6, 'w');
-		bqc &= bk && br1 && notAttacked(7, 1, 'b') && notAttacked(7, 2, 'b') && notAttacked(7, 3, 'b');
-		bkc &= bk && br2 && notAttacked(7, 5, 'b') && notAttacked(7, 6, 'b');
+		wqc = wk && wr1 && notAttacked(0, 1, 'w') && notAttacked(0, 2, 'w') && notAttacked(0, 3, 'w') && notAttacked(0, 4, 'w');
+		wkc = wk && wr2 && notAttacked(0, 4, 'w') && notAttacked(0, 5, 'w') && notAttacked(0, 6, 'w');
+		bqc = bk && br1 && notAttacked(7, 1, 'b') && notAttacked(7, 2, 'b') && notAttacked(7, 3, 'b') && notAttacked(7, 4, 'b');
+		bkc = bk && br2 && notAttacked(7, 4, 'b') && notAttacked(7, 5, 'b') && notAttacked(7, 6, 'b');
 	}
 }
