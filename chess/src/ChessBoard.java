@@ -81,14 +81,24 @@ class Square extends JPanel {
 		this.color = s.color;
 		if (s.piece == null)
 			this.piece = null;
-		switch (s.piece.type) {
+		else {
+			switch (s.piece.type) {
 			case 'P': this.piece = new Pawn(s.piece.pos_x, s.piece.pos_y, s.piece.color);	break;
 			case 'K': this.piece = new King(s.piece.pos_x, s.piece.pos_y, s.piece.color); break;
 			case 'Q': this.piece = new Queen(s.piece.pos_x, s.piece.pos_y, s.piece.color); break;
 			case 'R': this.piece = new Rook(s.piece.pos_x, s.piece.pos_y, s.piece.color); break;
 			case 'B': this.piece = new Bishop(s.piece.pos_x, s.piece.pos_y, s.piece.color); break;
 			case 'N': this.piece = new Knight(s.piece.pos_x, s.piece.pos_y, s.piece.color); break;
+			}
 		}
+	}
+	
+	void pasteSquare(Square s) {
+		this.x = s.x;
+		this.y = s.y;
+		this.clickable = s.clickable;
+		this.color = s.color;
+		this.piece = s.piece;
 	}
 	
 	void updatePiecePosition()
@@ -210,6 +220,13 @@ public class ChessBoard extends JFrame {
 		return prev;
 	}
 	
+	void pasteBoard(Square[][] prev) {
+		
+		for (int i=0; i<8; i++)
+			for (int j=0; j<8; j++)
+				sq[i][j].pasteSquare(prev[i][j]);
+	}
+	
 	void btnInit() { // 버튼 컴포넌트 초기설정
 		
 		for (int i=7; i>=0; i--) {
@@ -226,21 +243,11 @@ public class ChessBoard extends JFrame {
 							x1 = i;
 							y1 = j;
 							
-							System.out.println(notAttacked(7, 5, 'b'));
-							System.out.println(notAttacked(7, 6, 'b'));
-
+							//if (s.piece.type == 'K')
+							//	updateMovableForAllPieces();
+							
 							s.piece.findMovables(sq, bqc, bkc, wqc, wkc);
-							
-							System.out.println(notAttacked(7, 5, 'b'));
-							System.out.println(notAttacked(7, 6, 'b'));
-							
-							if (s.piece.type == 'K')
-								updateMovableForAllPieces();
-							
-							System.out.println(notAttacked(7, 5, 'b'));
-							System.out.println(notAttacked(7, 6, 'b'));
 
-							
 							s.piece.checkMovables(); // Debug: 콘솔에서 유효이동칸 확인하는 용도로 쓴 후 지우기
 							selectstate = true;
 							
@@ -249,7 +256,11 @@ public class ChessBoard extends JFrame {
 						}
 						else if (selectstate && sq[i][j].clickable) {
 							
-							Square[][] prev = copyBoard(sq); // 현재 board 상태 저장
+							updateAllPanels();
+							
+							Square[][] prev = copyBoard(sq); // 현재 board 상태 및 캐슬링 관련 변수 임시저장
+							boolean tmp_wr1 = wr1;	boolean tmp_wr2 = wr2;	boolean tmp_wk = wk;
+							boolean tmp_br1 = br1;	boolean tmp_br2 = br2;	boolean tmp_bk = bk;
 							
 							System.out.println("Square Selected. " + i + "," + j);
 							x2 = i;
@@ -258,14 +269,17 @@ public class ChessBoard extends JFrame {
 							
 							selectstate = false;		
 							updateMovableForAllPieces();
-							
-							// ** Check 판단 하고서 만약 check이면 prev를 다시 sq에 먹이기
+
+							// Check 판단 하고서 만약 check이면 prev를 다시 sq에 먹이기
 							if (checkCheck((turn%2 == 0 ? wKing : bKing), (turn%2 == 0 ? 'w' : 'b')))
 							{
-								//wk, rk 등 변수 되돌릴 방법 생각해봐야
 								System.out.println("Checked!!");
-								sq = prev;
-								cancelSelections();
+								
+								pasteBoard(prev); // sq <- prev
+								wr1 = tmp_wr1;	wr2 = tmp_wr2;	wk = tmp_wk;
+								br1 = tmp_br1;	br2 = tmp_br2;	wk = tmp_bk;
+								
+								updateMovableForAllPieces();
 								setClickable(true);
 							}
 							else {
@@ -281,6 +295,7 @@ public class ChessBoard extends JFrame {
 	
 	boolean checkCheck(Piece king, char c) {
 		
+		System.out.println(king.pos_x + " " + king.pos_y);
 		return !notAttacked(king.pos_x, king.pos_y, c);
 	}
 	
@@ -293,19 +308,20 @@ public class ChessBoard extends JFrame {
 			}
 	}
 	
-	void cancelSelections() { // 선택 해제
+	void updateAllPanels() { // 선택 해제
 		
 		for (int i=7; i>=0; i--)
 			for (int j=0; j<8; j++) {
 				sq[i][j].updatePanel();
 			}
 	}
+
 	
 	void setClickable(boolean clk) { // 버튼 활성화 여부 결정 (일괄)
 		
 		for (int i=7; i>=0; i--)
 			for (int j=0; j<8; j++)
-					sq[i][j].clickable = clk;
+				sq[i][j].clickable = clk;
 	}
 	
 	public boolean isFinish() {
@@ -430,8 +446,10 @@ public class ChessBoard extends JFrame {
 	void updateMovableForAllPieces() { 
 		for (int i=0; i<8; i++) {
 			for (int j=0; j<8; j++) {
-				if (sq[i][j].piece != null)
+				if (sq[i][j].piece != null) {
+					sq[i][j].updatePiecePosition();
 					sq[i][j].piece.findMovables(sq, bqc, bkc, wqc, wkc);
+				}
 			}
 		}
 		

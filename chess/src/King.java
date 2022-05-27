@@ -37,8 +37,8 @@ public class King extends Piece {
                         }
                     }
                 }
-                if(wqc && board[0][2].piece==null && board[0][3].piece==null && board[0][1].piece==null) Moveable[0][2]=true;
-                if(wkc && board[0][5].piece==null && board[0][6].piece==null) Moveable[0][6]=true;
+                if (wqc && board[0][2].piece==null && board[0][3].piece==null && board[0][1].piece==null) Moveable[0][2]=true;
+                if (wkc && board[0][5].piece==null && board[0][6].piece==null) Moveable[0][6]=true;
             }
 	}
 }
