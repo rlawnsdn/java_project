@@ -5,6 +5,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextPane;
 
 class Square extends JPanel {
 
@@ -71,26 +72,21 @@ class Square extends JPanel {
 		clickable = false;
 	}
 	
-	// Copy the state of the Square
 	Square(Square s) {
 		this.x = s.x;
 		this.y = s.y;
-		
-		this.pieceimg = s.pieceimg;
-		this.btn = s.btn;
 		this.clickable = s.clickable;
-		
 		this.color = s.color;
 		if (s.piece == null)
 			this.piece = null;
 		else {
 			switch (s.piece.type) {
-			case 'P': this.piece = new Pawn(s.piece.pos_x, s.piece.pos_y, s.piece.color);	break;
-			case 'K': this.piece = new King(s.piece.pos_x, s.piece.pos_y, s.piece.color); break;
-			case 'Q': this.piece = new Queen(s.piece.pos_x, s.piece.pos_y, s.piece.color); break;
-			case 'R': this.piece = new Rook(s.piece.pos_x, s.piece.pos_y, s.piece.color); break;
-			case 'B': this.piece = new Bishop(s.piece.pos_x, s.piece.pos_y, s.piece.color); break;
-			case 'N': this.piece = new Knight(s.piece.pos_x, s.piece.pos_y, s.piece.color); break;
+			case 'P': this.piece = new Pawn(this.x, this.y, s.piece.color);	break;
+			case 'K': this.piece = new King(this.x, this.y, s.piece.color); break;
+			case 'Q': this.piece = new Queen(this.x, this.y, s.piece.color); break;
+			case 'R': this.piece = new Rook(this.x, this.y, s.piece.color); break;
+			case 'B': this.piece = new Bishop(this.x, this.y, s.piece.color); break;
+			case 'N': this.piece = new Knight(this.x, this.y, s.piece.color); break;
 			}
 		}
 	}
@@ -100,7 +96,18 @@ class Square extends JPanel {
 		this.y = s.y;
 		this.clickable = s.clickable;
 		this.color = s.color;
-		this.piece = s.piece;
+		if (s.piece == null)
+			this.piece = null;
+		else {
+			switch (s.piece.type) {
+			case 'P': this.piece = new Pawn(this.x, this.y, s.piece.color);	break;
+			case 'K': this.piece = new King(this.x, this.y, s.piece.color); break;
+			case 'Q': this.piece = new Queen(this.x, this.y, s.piece.color); break;
+			case 'R': this.piece = new Rook(this.x, this.y, s.piece.color); break;
+			case 'B': this.piece = new Bishop(this.x, this.y, s.piece.color); break;
+			case 'N': this.piece = new Knight(this.x, this.y, s.piece.color); break;
+			}
+		}
 	}
 	
 	void updatePiecePosition()
@@ -171,9 +178,11 @@ public class ChessBoard extends JFrame {
 	Piece wKing, bKing;
 	
 	char preferredPromotion;
-	
 	int x1, y1, x2, y2;
-
+	
+	int commandType;
+	JTextPane systemmsg;
+	
 	ChessBoard() {
 		
 		this.sq = new Square[8][8];
@@ -192,6 +201,9 @@ public class ChessBoard extends JFrame {
 		this.selectstate = false;
 		
 		this.preferredPromotion = 'Q';
+		this.commandType = -1;
+		
+		this.systemmsg = new JTextPane();
 		
 		btnInit();
 	}
@@ -209,8 +221,14 @@ public class ChessBoard extends JFrame {
 	void pasteBoard(Square[][] prev) {
 		
 		for (int i=0; i<8; i++)
-			for (int j=0; j<8; j++)
+			for (int j=0; j<8; j++) {
 				sq[i][j].pasteSquare(prev[i][j]);
+				if (sq[i][j].piece != null && sq[i][j].piece.type == 'K') {
+					if (sq[i][j].piece.color == 'w') 		wKing = sq[i][j].piece;
+					else if (sq[i][j].piece.color == 'b')	bKing = sq[i][j].piece;
+				}
+			}
+
 	}
 	
 	// Set what the Buttons on the Squares should do
@@ -258,11 +276,15 @@ public class ChessBoard extends JFrame {
 								wr1 = tmp_wr1;	wr2 = tmp_wr2;	wk = tmp_wk;
 								br1 = tmp_br1;	br2 = tmp_br2;	wk = tmp_bk;
 								
+								systemmsg.setText("CANNOT MOVE!\nThe King will be attacked!\nTry another move.");
+								systemmsg.setForeground(Color.orange);
 								updateMovableForAllPieces();
 								setClickable(true);
 							}
 							else {
 								setClickable(false);
+								
+								commandType = -1;
 								turn++;
 							}
 						}
@@ -272,9 +294,17 @@ public class ChessBoard extends JFrame {
 		}
 	}
 	
-	boolean checkCheck(Piece king, char c) {
+	void enterSpecialCommand(int type) {
 		
-		System.out.println(king.pos_x + " " + king.pos_y);
+		updateAllPanels();
+		selectstate = false;
+		setClickable(false);
+		commandType = type;
+		turn++;
+	}
+	
+	boolean checkCheck(Piece king, char c) {
+
 		return !notAttacked(king.pos_x, king.pos_y, c);
 	}
 	
@@ -414,11 +444,12 @@ public class ChessBoard extends JFrame {
 			sq[x1][y1].piece = null;
 		}
 		
-		// Fake Pawn, which is made at last turn from the opponent, should be eliminated after the move
 		for(int i=0; i<8; i++)
-			for(int j=0; j<8; j++)
+			for(int j=0; j<8; j++) {
+				// Fake Pawn, which is made at last turn from the opponent, should be eliminated after the move
 				if(sq[i][j].piece != null && sq[i][j].piece.type =='F' && sq[i][j].piece.color == (turn%2 == 0 ? 'b':'w'))
-					sq[i][j].piece = null;
+					sq[i][j].piece = null;	
+			}
 	}
 
 	// whether the square (x, y) is being attacked by the opponent of the following color
@@ -434,11 +465,15 @@ public class ChessBoard extends JFrame {
 		return true;
 	}
 
-	void updateMovableForAllPieces() { 
+	void updateMovableForAllPieces() {
+		
+		for (int i=0; i<8; i++)
+			for (int j=0; j<8; j++)
+				sq[i][j].updatePiecePosition();
+
 		for (int i=0; i<8; i++) {
 			for (int j=0; j<8; j++) {
 				if (sq[i][j].piece != null) {
-					sq[i][j].updatePiecePosition();
 					sq[i][j].piece.findMovables(sq, bqc, bkc, wqc, wkc);
 				}
 			}

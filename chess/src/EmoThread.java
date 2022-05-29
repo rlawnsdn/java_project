@@ -17,7 +17,6 @@ public class EmoThread extends Thread {
 			DataOutputStream dos = new DataOutputStream(os);
 
 			dos.writeUTF("Emo Set " + id);
-			System.out.println(Server.getLog("emo is sent (" + id + ")"));
 			
 			//dos.close();
 			//this.soc.close();
@@ -33,7 +32,6 @@ public class EmoThread extends Thread {
 			DataOutputStream dos = new DataOutputStream(os);
 
 			dos.writeUTF(s);
-			System.out.println(Server.getLog("emo is sent (" + id + ")"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

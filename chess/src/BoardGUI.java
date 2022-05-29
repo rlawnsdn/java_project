@@ -1,5 +1,6 @@
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,6 +10,9 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.JTextPane;
+import javax.swing.text.*;
 
 public class BoardGUI {
 
@@ -73,6 +77,10 @@ class BoardFrame extends JFrame {
 	Emotion emo;
 	JPanel promotion;
 	
+	JTextPane systemmsg;
+	JPanel optionbuttons1; 	// Suggest DRAW, SURRENDER
+	JPanel optionbuttons2; 	// Accept or Reject the DRAW suggestion
+	
 	BoardFrame() {
 		setTitle("Chess");
 		
@@ -90,6 +98,28 @@ class BoardFrame extends JFrame {
 		
 		emo = new Emotion(player1);
 		c.add(emo);
+		
+		JPanel sys = new JPanel();
+		sys.setBounds(0, 400, 256, 128);
+		sys.setAlignmentY(CENTER_ALIGNMENT);
+		sys.setBackground(Color.black);
+		
+		systemmsg = new JTextPane();
+		systemmsg.setSize(220, 100);
+		systemmsg.setOpaque(true);
+		systemmsg.setBackground(Color.black);
+		systemmsg.setForeground(Color.yellow);
+		systemmsg.setFont(new Font("Serif", Font.PLAIN, 18));
+		
+		StyledDocument doc = systemmsg.getStyledDocument();
+		SimpleAttributeSet center = new SimpleAttributeSet();
+		StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
+		doc.setParagraphAttributes(0, doc.getLength(), center, false);
+		
+		systemmsg.setText("Waiting for\nAnother Player");
+		
+		sys.add(systemmsg);
+		c.add(sys);
 		
 		pack();
 
@@ -123,8 +153,55 @@ class BoardFrame extends JFrame {
 		promotion = new Promotion(cb);
 		c.add(promotion);
 		
+		optionbuttons1 = new JPanel();
+		optionbuttons2 = new JPanel();
+		optionbuttons1.setBounds(0, 540, 256, 176);
+		optionbuttons2.setBounds(0, 540, 256, 176);
+		optionbuttons1.setLayout(null);
+		optionbuttons2.setLayout(null);
+		
+		for (int i=0; i<4; i++)
+		{
+			JButton btn = new JButton();
+			btn.setBounds(20, 20 + 72*(i%2), 216, 64);
+			//btn.setContentAreaFilled(false);
+			btn.addActionListener(new IntClick(i) {
+				@Override
+				public void actionPerformed (ActionEvent e) {
+					cb.enterSpecialCommand(i);
+				}
+			});
+			
+			String str = "";
+			switch (i) {
+			case 0: str = "Suggest DRAW";	btn.setBackground(Color.getHSBColor(96/360f, 0.44f, 1f));	break;
+			case 1: str = "SURRENDER";		btn.setBackground(Color.getHSBColor(350/360f, 0.60f, 1f));	break;
+			case 2: str = "Accept";			btn.setBackground(Color.getHSBColor(160/360f, 0.60f, 1f));	break;
+			case 3: str = "Reject";			btn.setBackground(Color.getHSBColor(0, 0, 0.64f));	break;
+			}
+			JLabel lbl = new JLabel(str);
+			lbl.setForeground(Color.black);
+			lbl.setFont(new Font("Serif", Font.PLAIN, 18));
+			btn.add(lbl);	
+			
+			if (i/2 == 0)
+				optionbuttons1.add(btn);
+			else
+				optionbuttons2.add(btn);
+		}
+		
+		c.add(optionbuttons1);
+		c.add(optionbuttons2);
+		
 		repaint();
 		setVisible(true);
+		
+		cb.systemmsg = this.systemmsg;
+	}
+	
+	void setSystemMsg(String s, Color c) {
+		systemmsg.setText(s);
+		systemmsg.setForeground(c);
 	}
 }
 
@@ -207,7 +284,7 @@ class Emotion extends JPanel {
 			JButton btn = new JButton();
 			btn.setBounds(72*(i%3), 72*(i/3), 72, 72);
 			btn.setContentAreaFilled(false);
-			btn.addActionListener(new EmoClick(i) {
+			btn.addActionListener(new IntClick(i) {
 				@Override
 				public void actionPerformed (ActionEvent e) {
 					ImageIcon icn = new ImageIcon("src/emo/" + i + "R.png");
@@ -228,11 +305,11 @@ class Emotion extends JPanel {
 	}
 }
 
-class EmoClick implements ActionListener{
+class IntClick implements ActionListener{
 	
     final int i;
     
-    EmoClick(int i){
+    IntClick(int i){
         this.i = i;
     }
     
