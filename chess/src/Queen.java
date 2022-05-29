@@ -12,6 +12,8 @@ public class Queen extends Piece {
 	void findMovables(Square[][] board, boolean bqc, boolean bkc, boolean wqc, boolean wkc) {
 		for(int i=0; i<8; i++) for(int j=0; j<8; j++) Moveable[i][j]=false;
 
+			// Rook's movable squares + Bishop's movable squares
+		
             if(this.color=='b'){
                 int i=this.pos_x+1, j=this.pos_y+1;
                 while(0<=i && i<8 && 0<=j && j<8){
@@ -21,7 +23,7 @@ public class Queen extends Piece {
                         Moveable[i][j]=true;
                         break;
                     }
-                    i++; j++; //우측 하단
+                    i++; j++;
                 }
 
                 i=this.pos_x+1; j=this.pos_y-1;
@@ -32,7 +34,7 @@ public class Queen extends Piece {
                         Moveable[i][j]=true;
                         break;
                     }
-                    i++; j--; //좌측 하단
+                    i++; j--;
                 }
 
                 i=this.pos_x-1; j=this.pos_y+1;
@@ -43,7 +45,7 @@ public class Queen extends Piece {
                         Moveable[i][j]=true;
                         break;
                     }
-                    i--; j++; //우측 상단
+                    i--; j++;
                 }
 
                 i=this.pos_x-1; j=this.pos_y-1;
@@ -54,10 +56,10 @@ public class Queen extends Piece {
                         Moveable[i][j]=true;
                         break;
                     }
-                    i--; j--; //좌측 상단
+                    i--; j--;
                 }
 
-                for(i=this.pos_x+1; i<8; i++){ //아래쪽
+                for(i=this.pos_x+1; i<8; i++){
                     if(board[i][this.pos_y].piece==null) Moveable[i][this.pos_y]=true;
                     else if(board[i][this.pos_y].piece.color=='w'){
                         Moveable[i][this.pos_y]=true;
@@ -66,7 +68,7 @@ public class Queen extends Piece {
                     else break;
                 }
 
-                for(i=this.pos_x-1; i>=0; i--){ //위쪽
+                for(i=this.pos_x-1; i>=0; i--){
                     if(board[i][this.pos_y].piece==null) Moveable[i][this.pos_y]=true;
                     else if(board[i][this.pos_y].piece.color=='w'){
                         Moveable[i][this.pos_y]=true;
@@ -75,7 +77,7 @@ public class Queen extends Piece {
                     else break;
                 }
 
-                for(j=this.pos_y+1; j<8; j++){ //오른쪽
+                for(j=this.pos_y+1; j<8; j++){
                     if(board[this.pos_x][j].piece==null) Moveable[this.pos_x][j]=true;
                     else if(board[this.pos_x][j].piece.color=='w'){
                         Moveable[this.pos_x][j]=true;
@@ -84,7 +86,7 @@ public class Queen extends Piece {
                     else break;
                 }
 
-                for(j=this.pos_y-1; j>=0; j--){ //왼쪽
+                for(j=this.pos_y-1; j>=0; j--){
                     if(board[this.pos_x][j].piece==null) Moveable[this.pos_x][j]=true;
                     else if(board[this.pos_x][j].piece.color=='w'){
                         Moveable[this.pos_x][j]=true;

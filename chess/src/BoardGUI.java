@@ -40,13 +40,11 @@ public class BoardGUI {
 		if (s < 0) {
 			if (myself) {
 				ImageIcon icn = new ImageIcon("src/emo/" + (cboard.playsWhite ? 'w':'b') + "R.png");
-				//ImageIcon icn = new ImageIcon("emo/" + (cboard.playsWhite ? 'w':'b') + "R.png");
 				bframe.player1.emoidx = s;
 				bframe.player1.emoimg.setIcon(icn);
 			}
 			else {
 				ImageIcon icn = new ImageIcon("src/emo/" + (cboard.playsWhite ? 'b':'w') + "L.png");
-				//ImageIcon icn = new ImageIcon("emo/" + (cboard.playsWhite ? 'b':'w') + "L.png");
 				bframe.player2.emoidx = s;
 				bframe.player2.emoimg.setIcon(icn);
 			}
@@ -54,13 +52,11 @@ public class BoardGUI {
 		else {
 			if (myself) {
 				ImageIcon icn = new ImageIcon("src/emo/" + s + "R.png");
-				//ImageIcon icn = new ImageIcon("emo/" + s + "R.png");
 				bframe.player1.emoidx = s;
 				bframe.player1.emoimg.setIcon(icn);
 			}
 			else {
 				ImageIcon icn = new ImageIcon("src/emo/" + s + "L.png");
-				//ImageIcon icn = new ImageIcon("emo/" + s + "L.png");
 				bframe.player2.emoidx = s;
 				bframe.player2.emoimg.setIcon(icn);
 			}
@@ -95,7 +91,6 @@ class BoardFrame extends JFrame {
 		emo = new Emotion(player1);
 		c.add(emo);
 		
-		//setUndecorated(true); // SetSize가 의도대로 동작하지 않아 타이틀바 제거.
 		pack();
 
 		setSize(1296, 800); // 1280 * 768
@@ -211,13 +206,11 @@ class Emotion extends JPanel {
 		{
 			JButton btn = new JButton();
 			btn.setBounds(72*(i%3), 72*(i/3), 72, 72);
-			//btn.setOpaque(false);
 			btn.setContentAreaFilled(false);
 			btn.addActionListener(new EmoClick(i) {
 				@Override
 				public void actionPerformed (ActionEvent e) {
 					ImageIcon icn = new ImageIcon("src/emo/" + i + "R.png");
-					//ImageIcon icn = new ImageIcon("emo/" + i + "R.png");
 					pInfo.emoimg.setIcon(icn);
 					pInfo.emoidx = i;
 				}
@@ -225,7 +218,6 @@ class Emotion extends JPanel {
 			emos.add(btn);
 			
 			ImageIcon icn = new ImageIcon("src/emo/x" + i + ".png");
-			//ImageIcon icn = new ImageIcon("emo/x" + i + ".png");
 			JLabel lbl = new JLabel(icn);
 			lbl.setBounds(72*(i%3), 72*(i/3), 72, 72);
 			emos.add(lbl);			
@@ -284,8 +276,6 @@ class Promotion extends JPanel {
 			
 			ImageIcon icn = new ImageIcon("src/prmt/" + (cb.playsWhite ? 'w':'b') + pchar[i]
 					+ (cb.preferredPromotion == pchar[i] ? "_c.png" : "_n.png"));
-			//ImageIcon icn = new ImageIcon("prmt/" + (cb.playsWhite ? 'w':'b') + pchar[i]
-			//+ (cb.preferredPromotion == pchar[i] ? "_c.png" : "_n.png"));
 			lbl[i] = new JLabel(icn);
 			lbl[i].setBounds(108*(i%2), 54*(i/2), 108, 54);
 			promos.add(lbl[i]);			

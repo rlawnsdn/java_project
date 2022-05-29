@@ -16,7 +16,8 @@ class Square extends JPanel {
 	char color;
 	Piece piece;
 	
-	Square(int i, int j) {	// Initialize Board
+	// Initialize Board
+	Square(int i, int j) {
 		
 		this.x = i;
 		this.y = j;
@@ -70,7 +71,8 @@ class Square extends JPanel {
 		clickable = false;
 	}
 	
-	Square(Square s) { // Copy the state of the Square
+	// Copy the state of the Square
+	Square(Square s) {
 		this.x = s.x;
 		this.y = s.y;
 		
@@ -160,10 +162,10 @@ public class ChessBoard extends JFrame {
 	Square[][] sq;
 	int turn;
 	boolean gameEnds;
-	boolean wr1, wr2, wk, br1, br2, bk; // white rook1, white rook2, white king, black rook1, black rook2, black king의 이동여부 (true면 아직 이동안한 것)
-	boolean wkc, wqc, bkc, bqc; //캐슬링 가능여부
+	boolean wr1, wr2, wk, br1, br2, bk;	// whether Rooks and King have not moved yet
+	boolean wkc, wqc, bkc, bqc; 		// whether Castling is possible
 	
-	boolean selectstate; // false: 기물 선택, true: 위치 선택
+	boolean selectstate; // if true, the button may work to determine the destination of the selected piece
 	boolean playsWhite;
 	
 	Piece wKing, bKing;
@@ -194,22 +196,6 @@ public class ChessBoard extends JFrame {
 		btnInit();
 	}
 	
-	void printBoard() { // Test with Console before implementing GUI
-		
-		for (int i=7; i>=0; i--) {
-			for (int j=0; j<8; j++) {
-				System.out.print('|');
-				if (sq[i][j].piece != null) {
-					System.out.print(sq[i][j].piece.color);
-					System.out.print(sq[i][j].piece.type);
-				}
-				else
-					System.out.print("  ");
-			}
-			System.out.println('|');
-		}
-	}
-	
 	Square[][] copyBoard(Square[][] sq) {
 		
 		Square[][] prev = new Square[8][8];
@@ -227,8 +213,8 @@ public class ChessBoard extends JFrame {
 				sq[i][j].pasteSquare(prev[i][j]);
 	}
 	
-	void btnInit() { // 버튼 컴포넌트 초기설정
-		
+	// Set what the Buttons on the Squares should do
+	void btnInit() {
 		for (int i=7; i>=0; i--) {
 			for (int j=0; j<8; j++) {
 				sq[i][j].btn.addActionListener(new SquareClick(i, j, sq[i][j]) {
@@ -243,12 +229,7 @@ public class ChessBoard extends JFrame {
 							x1 = i;
 							y1 = j;
 							
-							//if (s.piece.type == 'K')
-							//	updateMovableForAllPieces();
-							
 							s.piece.findMovables(sq, bqc, bkc, wqc, wkc);
-
-							s.piece.checkMovables(); // Debug: 콘솔에서 유효이동칸 확인하는 용도로 쓴 후 지우기
 							selectstate = true;
 							
 							setClickable(s.piece.Moveable);
@@ -258,7 +239,7 @@ public class ChessBoard extends JFrame {
 							
 							updateAllPanels();
 							
-							Square[][] prev = copyBoard(sq); // 현재 board 상태 및 캐슬링 관련 변수 임시저장
+							Square[][] prev = copyBoard(sq); // Save the current state of the board
 							boolean tmp_wr1 = wr1;	boolean tmp_wr2 = wr2;	boolean tmp_wk = wk;
 							boolean tmp_br1 = br1;	boolean tmp_br2 = br2;	boolean tmp_bk = bk;
 							
@@ -270,11 +251,9 @@ public class ChessBoard extends JFrame {
 							selectstate = false;		
 							updateMovableForAllPieces();
 
-							// Check 판단 하고서 만약 check이면 prev를 다시 sq에 먹이기
+							// If the attempted move cannot escape Check, cancel the move
 							if (checkCheck((turn%2 == 0 ? wKing : bKing), (turn%2 == 0 ? 'w' : 'b')))
 							{
-								System.out.println("Checked!!");
-								
 								pasteBoard(prev); // sq <- prev
 								wr1 = tmp_wr1;	wr2 = tmp_wr2;	wk = tmp_wk;
 								br1 = tmp_br1;	br2 = tmp_br2;	wk = tmp_bk;
@@ -299,8 +278,7 @@ public class ChessBoard extends JFrame {
 		return !notAttacked(king.pos_x, king.pos_y, c);
 	}
 	
-	void setClickable(boolean[][] mov) { // 버튼 활성화 여부 결정
-		
+	void setClickable(boolean[][] mov) {
 		for (int i=7; i>=0; i--)
 			for (int j=0; j<8; j++) {
 				sq[i][j].clickable = mov[i][j];
@@ -308,16 +286,14 @@ public class ChessBoard extends JFrame {
 			}
 	}
 	
-	void updateAllPanels() { // 선택 해제
-		
+	void updateAllPanels() {
 		for (int i=7; i>=0; i--)
 			for (int j=0; j<8; j++) {
 				sq[i][j].updatePanel();
 			}
 	}
-
 	
-	void setClickable(boolean clk) { // 버튼 활성화 여부 결정 (일괄)
+	void setClickable(boolean clk) {
 		
 		for (int i=7; i>=0; i--)
 			for (int j=0; j<8; j++)
@@ -329,38 +305,39 @@ public class ChessBoard extends JFrame {
 		return this.gameEnds;
 	}
 	
-
-	void movepiece(int x1, int y1, int x2, int y2, char pref){ //(x1, y1)에서 (x2, y2)로 이동할 때
+	// Move a piece from (x1, y1) to (x2, y2), assuming the move is valid.
+	void movepiece(int x1, int y1, int x2, int y2, char pref) {
 		
+		// If you are moving King...
 		if(sq[x1][y1].piece.type=='K'){
 			
-			// 킹이 이동하면 캐슬링 불가능 (킹의 움직임이 유효한 상태라 가정)
+			// If King moves once... set bk/wk to false not to allow Castling later
 			if (sq[x1][y1].piece.color=='b') {this.bk = false;}
 			else {this.wk = false;}
 			
-			// 캐슬링
+			// Also move the Rook if Castling
 			if (x1 == 0 && y1 == 4 && x2 == 0 && y2 == 2){
-				sq[0][2].piece = sq[0][4].piece; //킹 이동
+				sq[0][2].piece = sq[0][4].piece;
 				sq[0][4].piece = null;
-				sq[0][3].piece = sq[0][0].piece; //룩 이동
+				sq[0][3].piece = sq[0][0].piece;
 				sq[0][0].piece = null;
 			}
 			else if (x1 == 0 && y1 == 4 && x2 == 0 && y2 == 6){
-				sq[0][6].piece = sq[0][4].piece; //킹 이동
+				sq[0][6].piece = sq[0][4].piece;
 				sq[0][4].piece = null;
-				sq[0][5].piece = sq[0][7].piece; //룩 이동
+				sq[0][5].piece = sq[0][7].piece;
 				sq[0][7].piece = null;
 			}
 			else if (x1 == 7 && y1 == 4 && x2 == 7 && y2 == 2){
-				sq[7][2].piece = sq[7][4].piece; //킹 이동
+				sq[7][2].piece = sq[7][4].piece;
 				sq[7][4].piece = null;
-				sq[7][3].piece = sq[7][0].piece; //룩 이동
+				sq[7][3].piece = sq[7][0].piece;
 				sq[7][0].piece = null;
 			}
 			else if (x1 == 7 && y1 == 4 && x2 == 7 && y2 == 6){
-				sq[7][6].piece = sq[7][4].piece; //킹 이동
+				sq[7][6].piece = sq[7][4].piece;
 				sq[7][4].piece = null;
-				sq[7][5].piece = sq[7][7].piece; //룩 이동
+				sq[7][5].piece = sq[7][7].piece;
 				sq[7][7].piece = null;
 			}
 			else
@@ -369,7 +346,11 @@ public class ChessBoard extends JFrame {
 				sq[x1][y1].piece = null;
 			}
 		}
-		else if (sq[x1][y1].piece.type=='R'){ // 룩이 이동하면 캐슬링 불가능 (룩의 움직임이 유효한 상태라 가정)
+		
+		// If you are moving Rook...
+		else if (sq[x1][y1].piece.type=='R'){
+			
+			// If Rook moves once... set bk/wk to false not to allow Castling later
 			if(sq[x1][y1].piece.color=='b'){
 				if(y1==0){this.br1 = false;}
 				else{this.br2 = false;}
@@ -382,11 +363,15 @@ public class ChessBoard extends JFrame {
 			sq[x2][y2].piece = sq[x1][y1].piece;
 			sq[x1][y1].piece = null;
 		}
-		else if(sq[x1][y1].piece.type=='P'){ //앙파상 & 프로모션
+		
+		// If you are moving Pawn...
+		else if(sq[x1][y1].piece.type=='P'){
+			
+			// If it moves two squares, make a fake Pawn for En Passant
 			if (Math.abs(x1 - x2) == 2){
 				if (x1 < x2){
 					sq[x1+1][y1].piece = new Pawn(x1+1, y1, sq[x1][y1].piece.color);
-					sq[x1+1][y1].piece.type = 'F'; //fake pawn을 만든다
+					sq[x1+1][y1].piece.type = 'F'; // F: Fake Pawn
 				}
 				else{
 					sq[x1-1][y1].piece = new Pawn(x1-1, y1, sq[x1][y1].piece.color);
@@ -394,7 +379,8 @@ public class ChessBoard extends JFrame {
 				}
 			}
 			
-			if (sq[x2][y2].piece != null && sq[x2][y2].piece.type =='F') // fake pawn이 있을 시 해당 pawn 잡기
+			// If it catches a fake Pawn, also remove a real Pawn corresponding
+			if (sq[x2][y2].piece != null && sq[x2][y2].piece.type =='F')
 			{
 				if (sq[x2][y2].piece.color == 'b') sq[x2-1][y2].piece = null;
 				else if (sq[x2][y2].piece.color == 'w') sq[x2+1][y2].piece = null;
@@ -403,6 +389,7 @@ public class ChessBoard extends JFrame {
 			sq[x2][y2].piece = sq[x1][y1].piece;
 			sq[x1][y1].piece = null;
 			
+			// If it reaches the end of the board, promote it to the piece you prefer
 			if (sq[x2][y2].piece.color == 'b' && x2 == 0) {
 				switch (pref) {
 				case 'Q':	sq[x2][y2].piece = new Queen(x2, y2, 'b'); 		break;
@@ -420,18 +407,22 @@ public class ChessBoard extends JFrame {
 				}
 			}
 		}
-		else{ //평범한 이동
+		
+		// Normal moves
+		else{
 			sq[x2][y2].piece = sq[x1][y1].piece;
 			sq[x1][y1].piece = null;
 		}
 		
+		// Fake Pawn, which is made at last turn from the opponent, should be eliminated after the move
 		for(int i=0; i<8; i++)
 			for(int j=0; j<8; j++)
 				if(sq[i][j].piece != null && sq[i][j].piece.type =='F' && sq[i][j].piece.color == (turn%2 == 0 ? 'b':'w'))
-					sq[i][j].piece = null; // 이전 턴에 만든 fake pawn이 있다면, fake pawn을 제거
+					sq[i][j].piece = null;
 	}
 
-	boolean notAttacked(int x, int y, char color) { // 입력된 칸이 'color'의 입장에서 공격받는 상태인지 체크 (color가 흑이면 흑의 입장에서 백에게 공격받는지?)
+	// whether the square (x, y) is being attacked by the opponent of the following color
+	boolean notAttacked(int x, int y, char color) {
 		color = color == 'b' ? 'w':'b';
 		for (int i=0; i<8; i++) {
 			for (int j=0; j<8; j++) {
@@ -453,10 +444,10 @@ public class ChessBoard extends JFrame {
 			}
 		}
 		
-		// 캐슬링 가능 여부 최종 확인(킹과 룩 사이 칸들이 공격받지 않아야 한다.)
-		wqc = wk && wr1 && notAttacked(0, 1, 'w') && notAttacked(0, 2, 'w') && notAttacked(0, 3, 'w') && notAttacked(0, 4, 'w');
+		// Update whether the each following Castling is possible
+		wqc = wk && wr1 && notAttacked(0, 2, 'w') && notAttacked(0, 3, 'w') && notAttacked(0, 4, 'w');
 		wkc = wk && wr2 && notAttacked(0, 4, 'w') && notAttacked(0, 5, 'w') && notAttacked(0, 6, 'w');
-		bqc = bk && br1 && notAttacked(7, 1, 'b') && notAttacked(7, 2, 'b') && notAttacked(7, 3, 'b') && notAttacked(7, 4, 'b');
+		bqc = bk && br1 && notAttacked(7, 2, 'b') && notAttacked(7, 3, 'b') && notAttacked(7, 4, 'b');
 		bkc = bk && br2 && notAttacked(7, 4, 'b') && notAttacked(7, 5, 'b') && notAttacked(7, 6, 'b');
 	}
 }

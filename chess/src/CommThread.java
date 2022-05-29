@@ -20,7 +20,7 @@ public class CommThread extends Thread {
 			System.out.println(Server.getLog("message is sent (" + id + ")"));
 			
 			//dos.close();
-			//this.soc.close();
+			//soc.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
