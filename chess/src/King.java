@@ -1,8 +1,6 @@
 
 public class King extends Piece {
 
-	boolean checked;
-	
 	King(int x, int y, char c) {
 		
 		this.pos_x = x;

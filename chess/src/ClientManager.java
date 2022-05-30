@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 
 class PlayerClient extends Thread {
 	
@@ -55,7 +56,7 @@ class PlayerClient extends Thread {
 				}
 			}
 			
-			while (gameStarted) {
+			while (true) {
 				
 				turncheck = cboard.turn;
 				String str = "";
@@ -66,11 +67,7 @@ class PlayerClient extends Thread {
 					System.out.println("Received... [" + str + "]");	
 				}
 				
-				if (str.equals("GameEnds")) {
-					gameStarted = false;
-					break;
-				}
-				else if (str.startsWith("Moves:")) {
+				if (str.startsWith("Moves:")) {
 					char[] c = str.substring(6).toCharArray();
 					cboard.movepiece(c[0]-48, c[1]-48, c[2]-48, c[3]-48, c[4]);
 					cboard.updateMovableForAllPieces();
@@ -93,6 +90,9 @@ class PlayerClient extends Thread {
 					}
 					bgui.bframe.optionbuttons1.setVisible(c-48 == 3);
 					bgui.bframe.optionbuttons2.setVisible(c-48 == 0);
+					
+					if (c-48 == 1 || c-48 == 2) break;
+					
 					cboard.turn++;
 					myturn ^= true;
 					continue;
@@ -101,6 +101,10 @@ class PlayerClient extends Thread {
 				while (cboard.turn == turncheck) {
 					PlayerClient.sleep(50);
 				}
+			
+				cboard.setClickable(false);
+				bgui.bframe.optionbuttons1.setVisible(false);
+				bgui.bframe.optionbuttons2.setVisible(false);
 				
 				if (cboard.commandType == -1) {
 					send(soc, "Moves:" + cboard.x1 + cboard.y1 + cboard.x2 + cboard.y2 + cboard.preferredPromotion);	
@@ -111,8 +115,6 @@ class PlayerClient extends Thread {
 					send(soc, "Spcmd:" + cboard.commandType);
 					System.out.println("sended... [Spcmd:" + cboard.commandType + "]");
 					
-					bgui.bframe.optionbuttons1.setVisible(false);
-					bgui.bframe.optionbuttons2.setVisible(false);
 					switch (cboard.commandType) {
 					case 0: bgui.bframe.setSystemMsg("A draw has been suggested.\nWait for the opponent.", Color.yellow); break;
 					case 1:	bgui.bframe.setSystemMsg("You have surrendered.\nYOU LOSE!", Color.red); break;
@@ -120,14 +122,18 @@ class PlayerClient extends Thread {
 					case 3: bgui.bframe.setSystemMsg("Suggestion rejected.\nOpponent's Turn.", Color.white); break;
 					}
 				}
-
-				cboard.setClickable(false);
 				bgui.updateBoardGUI(cboard.sq);
+				
+				if (cboard.commandType == 1 || cboard.commandType == 2) break;
 				myturn ^= true;
 			}
 
-			//dis.close();
-			//soc.close();
+			dis.close();
+			soc.close();
+		} catch (SocketException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			bgui.bframe.setSystemMsg("The server has shut down.\nGame Ends.", Color.magenta);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -178,16 +184,18 @@ class EmoManager extends Thread {
 			Socket soc = new Socket("localhost", 5000);
 			DataInputStream dis = new DataInputStream(soc.getInputStream());
 			while (true) {
-				try {
-					EmoManager.sleep(50);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				EmoManager.sleep(50);
 				String str = dis.readUTF();
 				bgui.updateEmo(false, str.toCharArray()[0] - 48);
 				send(soc, Integer.toString(bgui.bframe.player1.emoidx));
 			}
+		} catch (SocketException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			bgui.bframe.setSystemMsg("The server has shut down.\nGame Ends.", Color.magenta);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

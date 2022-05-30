@@ -10,7 +10,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.text.*;
 
@@ -90,7 +89,7 @@ class BoardFrame extends JFrame {
 		Container c = getContentPane();
 		setResizable(false);
 
-		c.setBackground(Color.getHSBColor(32/360f, 0.4f, 0.6f));
+		c.setBackground(Color.getHSBColor(27/360f, 0.12f, 0.50f));
 		c.setLayout(null);
 		
 		c.add(player2);
@@ -100,12 +99,12 @@ class BoardFrame extends JFrame {
 		c.add(emo);
 		
 		JPanel sys = new JPanel();
-		sys.setBounds(0, 400, 256, 128);
-		sys.setAlignmentY(CENTER_ALIGNMENT);
+		sys.setBounds(0, 464, 256, 128);
+		sys.setLayout(null);
 		sys.setBackground(Color.black);
 		
 		systemmsg = new JTextPane();
-		systemmsg.setSize(220, 100);
+		systemmsg.setBounds(18, 20, 220, 88);
 		systemmsg.setOpaque(true);
 		systemmsg.setBackground(Color.black);
 		systemmsg.setForeground(Color.yellow);
@@ -121,9 +120,25 @@ class BoardFrame extends JFrame {
 		sys.add(systemmsg);
 		c.add(sys);
 		
+		chessboard = new JPanel();
+		chessboard.setBounds(320, 64, 640, 640);
+		chessboard.setAlignmentX(CENTER_ALIGNMENT);
+		chessboard.setAlignmentY(CENTER_ALIGNMENT);
+		chessboard.setLayout(new GridLayout(8,8));
+		
+		for (int i=7; i>=0; i--)
+			for (int j=0; j<8; j++) {
+				JPanel tempsq = new JPanel();
+				tempsq.setSize(80, 80);
+				tempsq.setBackground((i+j)%2==0 ? Color.getHSBColor(32/360f, 0.90f, 0.18f) : Color.getHSBColor(32/360f, 0.23f, 0.84f));
+				chessboard.add(tempsq);
+			}
+		
+		c.add(chessboard);
+		
 		pack();
 
-		setSize(1296, 800); // 1280 * 768
+		setSize(1296, 808); // 1280 * 768
 		setLocationRelativeTo(null);
 		setVisible(true);
 	}
@@ -134,8 +149,12 @@ class BoardFrame extends JFrame {
 		player1.updatePlayerInfo(true, white ? 'w':'b');
 		player2.updatePlayerInfo(false, white ? 'b':'w');
 		
-		chessboard = new JPanel();
+		Container c = getContentPane();
+		setResizable(false);
 		
+		c.remove(chessboard);
+		
+		chessboard = new JPanel();
 		chessboard.setBounds(320, 64, 640, 640);
 		chessboard.setAlignmentX(CENTER_ALIGNMENT);
 		chessboard.setAlignmentY(CENTER_ALIGNMENT);
@@ -144,9 +163,6 @@ class BoardFrame extends JFrame {
 		for (int i=7; i>=0; i--)
 			for (int j=0; j<8; j++)
 				chessboard.add(white ? cb.sq[i][j] : cb.sq[7-i][7-j]);
-
-		Container c = getContentPane();
-		setResizable(false);
 		
 		c.add(chessboard);
 		
@@ -155,8 +171,10 @@ class BoardFrame extends JFrame {
 		
 		optionbuttons1 = new JPanel();
 		optionbuttons2 = new JPanel();
-		optionbuttons1.setBounds(0, 540, 256, 176);
-		optionbuttons2.setBounds(0, 540, 256, 176);
+		optionbuttons1.setBounds(0, 592, 256, 176);
+		optionbuttons2.setBounds(0, 592, 256, 176);
+		optionbuttons1.setBackground(Color.getHSBColor(27/360f, 0.12f, 0.60f));
+		optionbuttons2.setBackground(Color.getHSBColor(27/360f, 0.12f, 0.60f));
 		optionbuttons1.setLayout(null);
 		optionbuttons2.setLayout(null);
 		
@@ -164,7 +182,6 @@ class BoardFrame extends JFrame {
 		{
 			JButton btn = new JButton();
 			btn.setBounds(20, 20 + 72*(i%2), 216, 64);
-			//btn.setContentAreaFilled(false);
 			btn.addActionListener(new IntClick(i) {
 				@Override
 				public void actionPerformed (ActionEvent e) {
@@ -182,6 +199,7 @@ class BoardFrame extends JFrame {
 			JLabel lbl = new JLabel(str);
 			lbl.setForeground(Color.black);
 			lbl.setFont(new Font("Serif", Font.PLAIN, 18));
+			lbl.setAlignmentX(CENTER_ALIGNMENT);
 			btn.add(lbl);	
 			
 			if (i/2 == 0)
@@ -224,6 +242,7 @@ class SquareClick implements ActionListener{
 class PlayerInfo extends JPanel {
 
 	boolean myself;
+	char color;
 	JLabel emoimg;
 	int emoidx;
 	
@@ -231,10 +250,10 @@ class PlayerInfo extends JPanel {
 		
 		this.myself = true;
 		
-		if (myself) setBounds(1024, 384, 256, 384);
-		else setBounds(0, 0, 256, 384);
+		if (myself) setBounds(1024, 328, 256, 256);
+		else setBounds(0, 0, 256, 256);
 		setLayout(null);
-		setBackground(Color.getHSBColor(32/255f, 0, 0.7f));
+		setBackground(Color.getHSBColor(0, 0, 0.7f));
 		
 		ImageIcon icn = new ImageIcon("src/emo/p" + (myself ? 'R' : 'L') + ".png");
 		emoimg = new JLabel(icn);
@@ -249,17 +268,12 @@ class PlayerInfo extends JPanel {
 	void updatePlayerInfo(boolean myself, char color) {
 		
 		this.myself = true;
-		
-		if (myself) setBounds(1024, 384, 256, 384);
-		else setBounds(0, 0, 256, 384);
-		setLayout(null);
-		setBackground(Color.getHSBColor(32/255f, 0, 0.7f));
+		this.color = color;
+
+		setBackground(color == 'w' ? Color.lightGray : Color.darkGray);
 		
 		ImageIcon icn = new ImageIcon("src/emo/" + color + (myself ? 'R' : 'L') + ".png");
 		emoimg.setIcon(icn);
-		emoimg.setBounds(20, 20, 216, 216);
-		emoimg.setAlignmentX(CENTER_ALIGNMENT);
-		emoimg.setAlignmentY(CENTER_ALIGNMENT);
 	}
 }
 
@@ -271,9 +285,9 @@ class Emotion extends JPanel {
 		
 		this.pInfo = p;
 		
-		setBounds(1024, 200, 256, 184);
+		setBounds(1024, 584, 256, 184);
 		setLayout(null);
-		setBackground(Color.getHSBColor(32/255f, 0, 0.5f));
+		setBackground(Color.getHSBColor(27/360f, 0.12f, 0.40f));
 		
 		JPanel emos = new JPanel();
 		emos.setBounds(20, 20, 216, 144);
@@ -287,9 +301,17 @@ class Emotion extends JPanel {
 			btn.addActionListener(new IntClick(i) {
 				@Override
 				public void actionPerformed (ActionEvent e) {
-					ImageIcon icn = new ImageIcon("src/emo/" + i + "R.png");
-					pInfo.emoimg.setIcon(icn);
-					pInfo.emoidx = i;
+					if (pInfo.emoidx == i) {
+						ImageIcon icn = new ImageIcon("src/emo/" + pInfo.color + "R.png");
+						pInfo.emoimg.setIcon(icn);
+						pInfo.emoidx = -1;
+					}
+					else
+					{
+						ImageIcon icn = new ImageIcon("src/emo/" + i + "R.png");
+						pInfo.emoimg.setIcon(icn);
+						pInfo.emoidx = i;
+					}
 				}
 			});
 			emos.add(btn);
@@ -328,9 +350,9 @@ class Promotion extends JPanel {
 		this.chessBoard = cb;
 		lbl = new JLabel[4];
 		
-		setBounds(1024, 56, 256, 144);
+		setBounds(1024, 0, 256, 144);
 		setLayout(null);
-		setBackground(Color.getHSBColor(32/255f, 0, 0.3f));
+		setBackground(Color.getHSBColor(27/360f, 0.12f, 0.60f));
 		
 		JPanel promos = new JPanel();
 		promos.setBounds(20, 20, 216, 104);

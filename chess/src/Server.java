@@ -75,13 +75,22 @@ public class Server {
 				if (white) 	receiveAndSend(playerclient[0], playerclient[1]);
 				else		receiveAndSend(playerclient[1], playerclient[0]);
 				white ^= true;
+			} catch (SocketException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				break;
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}
+			} 
 		}
 		
-		//ss.close();
+		try {
+			ss.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
     public static void receiveAndSend(CommThread comm1, CommThread comm2) throws IOException {
@@ -130,6 +139,10 @@ class ServerEmoManager extends Thread {
 			try {
 				receiveAndSend(playeremo[0], playeremo[1]);
 				receiveAndSend(playeremo[1], playeremo[0]);
+			} catch (SocketException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				break;
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

@@ -17,7 +17,7 @@ public class Queen extends Piece {
             if(this.color=='b'){
                 int i=this.pos_x+1, j=this.pos_y+1;
                 while(0<=i && i<8 && 0<=j && j<8){
-                    if(board[i][j].piece==null) Moveable[i][j]=true;
+                    if(board[i][j].piece==null || board[i][j].piece.type=='F') Moveable[i][j]=true;
                     else if(board[i][j].piece.color=='b') break;
                     else{
                         Moveable[i][j]=true;
@@ -28,7 +28,7 @@ public class Queen extends Piece {
 
                 i=this.pos_x+1; j=this.pos_y-1;
                 while(0<=i && i<8 && 0<=j && j<8){
-                    if(board[i][j].piece==null) Moveable[i][j]=true;
+                    if(board[i][j].piece==null || board[i][j].piece.type=='F') Moveable[i][j]=true;
                     else if(board[i][j].piece.color=='b') break;
                     else{
                         Moveable[i][j]=true;
@@ -39,7 +39,7 @@ public class Queen extends Piece {
 
                 i=this.pos_x-1; j=this.pos_y+1;
                 while(0<=i && i<8 && 0<=j && j<8){
-                    if(board[i][j].piece==null) Moveable[i][j]=true;
+                    if(board[i][j].piece==null || board[i][j].piece.type=='F') Moveable[i][j]=true;
                     else if(board[i][j].piece.color=='b') break;
                     else{
                         Moveable[i][j]=true;
@@ -50,7 +50,7 @@ public class Queen extends Piece {
 
                 i=this.pos_x-1; j=this.pos_y-1;
                 while(0<=i && i<8 && 0<=j && j<8){
-                    if(board[i][j].piece==null) Moveable[i][j]=true;
+                    if(board[i][j].piece==null || board[i][j].piece.type=='F') Moveable[i][j]=true;
                     else if(board[i][j].piece.color=='b') break;
                     else{
                         Moveable[i][j]=true;
@@ -60,7 +60,7 @@ public class Queen extends Piece {
                 }
 
                 for(i=this.pos_x+1; i<8; i++){
-                    if(board[i][this.pos_y].piece==null) Moveable[i][this.pos_y]=true;
+                    if(board[i][this.pos_y].piece==null || board[i][this.pos_y].piece.type=='F') Moveable[i][this.pos_y]=true;
                     else if(board[i][this.pos_y].piece.color=='w'){
                         Moveable[i][this.pos_y]=true;
                         break;
@@ -69,7 +69,7 @@ public class Queen extends Piece {
                 }
 
                 for(i=this.pos_x-1; i>=0; i--){
-                    if(board[i][this.pos_y].piece==null) Moveable[i][this.pos_y]=true;
+                    if(board[i][this.pos_y].piece==null || board[i][this.pos_y].piece.type=='F') Moveable[i][this.pos_y]=true;
                     else if(board[i][this.pos_y].piece.color=='w'){
                         Moveable[i][this.pos_y]=true;
                         break;
@@ -78,7 +78,7 @@ public class Queen extends Piece {
                 }
 
                 for(j=this.pos_y+1; j<8; j++){
-                    if(board[this.pos_x][j].piece==null) Moveable[this.pos_x][j]=true;
+                    if(board[this.pos_x][j].piece==null || board[this.pos_x][j].piece.type=='F') Moveable[this.pos_x][j]=true;
                     else if(board[this.pos_x][j].piece.color=='w'){
                         Moveable[this.pos_x][j]=true;
                         break;
@@ -87,7 +87,7 @@ public class Queen extends Piece {
                 }
 
                 for(j=this.pos_y-1; j>=0; j--){
-                    if(board[this.pos_x][j].piece==null) Moveable[this.pos_x][j]=true;
+                    if(board[this.pos_x][j].piece==null || board[this.pos_x][j].piece.type=='F') Moveable[this.pos_x][j]=true;
                     else if(board[this.pos_x][j].piece.color=='w'){
                         Moveable[this.pos_x][j]=true;
                         break;
@@ -99,7 +99,7 @@ public class Queen extends Piece {
             if(this.color=='w'){
                 int i=this.pos_x+1, j=this.pos_y+1;
                 while(0<=i && i<8 && 0<=j && j<8){
-                    if(board[i][j].piece==null) Moveable[i][j]=true;
+                    if(board[i][j].piece==null || board[i][j].piece.type=='F') Moveable[i][j]=true;
                     else if(board[i][j].piece.color=='w') break;
                     else{
                         Moveable[i][j]=true;
@@ -110,7 +110,7 @@ public class Queen extends Piece {
 
                 i=this.pos_x+1; j=this.pos_y-1;
                 while(0<=i && i<8 && 0<=j && j<8){
-                    if(board[i][j].piece==null) Moveable[i][j]=true;
+                    if(board[i][j].piece==null || board[i][j].piece.type=='F') Moveable[i][j]=true;
                     else if(board[i][j].piece.color=='w') break;
                     else{
                         Moveable[i][j]=true;
@@ -121,7 +121,7 @@ public class Queen extends Piece {
 
                 i=this.pos_x-1; j=this.pos_y+1;
                 while(0<=i && i<8 && 0<=j && j<8){
-                    if(board[i][j].piece==null) Moveable[i][j]=true;
+                    if(board[i][j].piece==null || board[i][j].piece.type=='F') Moveable[i][j]=true;
                     else if(board[i][j].piece.color=='w') break;
                     else{
                         Moveable[i][j]=true;
@@ -132,7 +132,7 @@ public class Queen extends Piece {
 
                 i=this.pos_x-1; j=this.pos_y-1;
                 while(0<=i && i<8 && 0<=j && j<8){
-                    if(board[i][j].piece==null) Moveable[i][j]=true;
+                    if(board[i][j].piece==null || board[i][j].piece.type=='F') Moveable[i][j]=true;
                     else if(board[i][j].piece.color=='w') break;
                     else{
                         Moveable[i][j]=true;
@@ -142,7 +142,7 @@ public class Queen extends Piece {
                 }
 
                 for(i=this.pos_x+1; i<8; i++){
-                    if(board[i][this.pos_y].piece==null) Moveable[i][this.pos_y]=true;
+                    if(board[i][this.pos_y].piece==null || board[i][this.pos_y].piece.type=='F') Moveable[i][this.pos_y]=true;
                     else if(board[i][this.pos_y].piece.color=='b'){
                         Moveable[i][this.pos_y]=true;
                         break;
@@ -151,7 +151,7 @@ public class Queen extends Piece {
                 }
 
                 for(i=this.pos_x-1; i>=0; i--){
-                    if(board[i][this.pos_y].piece==null) Moveable[i][this.pos_y]=true;
+                    if(board[i][this.pos_y].piece==null || board[i][this.pos_y].piece.type=='F') Moveable[i][this.pos_y]=true;
                     else if(board[i][this.pos_y].piece.color=='b'){
                         Moveable[i][this.pos_y]=true;
                         break;
@@ -160,7 +160,7 @@ public class Queen extends Piece {
                 }
 
                 for(j=this.pos_y+1; j<8; j++){
-                    if(board[this.pos_x][j].piece==null) Moveable[this.pos_x][j]=true;
+                    if(board[this.pos_x][j].piece==null || board[this.pos_x][j].piece.type=='F') Moveable[this.pos_x][j]=true;
                     else if(board[this.pos_x][j].piece.color=='b'){
                         Moveable[this.pos_x][j]=true;
                         break;
@@ -169,7 +169,7 @@ public class Queen extends Piece {
                 }
 
                 for(j=this.pos_y-1; j>=0; j--){
-                    if(board[this.pos_x][j].piece==null) Moveable[this.pos_x][j]=true;
+                    if(board[this.pos_x][j].piece==null || board[this.pos_x][j].piece.type=='F') Moveable[this.pos_x][j]=true;
                     else if(board[this.pos_x][j].piece.color=='b'){
                         Moveable[this.pos_x][j]=true;
                         break;

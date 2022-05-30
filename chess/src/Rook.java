@@ -15,7 +15,7 @@ public class Rook extends Piece {
 			
 			// Lower Side
 			for(int i=this.pos_x+1; i<8; i++){
-				if(board[i][this.pos_y].piece==null) Moveable[i][this.pos_y]=true;
+				if(board[i][this.pos_y].piece==null || board[i][this.pos_y].piece.type=='F') Moveable[i][this.pos_y]=true;
 				else if(board[i][this.pos_y].piece.color=='w'){
 					Moveable[i][this.pos_y]=true;
 					break;
@@ -24,7 +24,7 @@ public class Rook extends Piece {
 			}
 			// Upper Side
 			for(int i=this.pos_x-1; i>=0; i--){
-				if(board[i][this.pos_y].piece==null) Moveable[i][this.pos_y]=true;
+				if(board[i][this.pos_y].piece==null || board[i][this.pos_y].piece.type=='F') Moveable[i][this.pos_y]=true;
 				else if(board[i][this.pos_y].piece.color=='w'){
 					Moveable[i][this.pos_y]=true;
 					break;
@@ -33,7 +33,7 @@ public class Rook extends Piece {
 			}
 			// Right Side
 			for(int j=this.pos_y+1; j<8; j++){
-				if(board[this.pos_x][j].piece==null) Moveable[this.pos_x][j]=true;
+				if(board[this.pos_x][j].piece==null || board[this.pos_x][j].piece.type=='F') Moveable[this.pos_x][j]=true;
 				else if(board[this.pos_x][j].piece.color=='w'){
 					Moveable[this.pos_x][j]=true;
 					break;
@@ -42,7 +42,7 @@ public class Rook extends Piece {
 			}
 			// Left Side
 			for(int j=this.pos_y-1; j>=0; j--){
-				if(board[this.pos_x][j].piece==null) Moveable[this.pos_x][j]=true;
+				if(board[this.pos_x][j].piece==null || board[this.pos_x][j].piece.type=='F') Moveable[this.pos_x][j]=true;
 				else if(board[this.pos_x][j].piece.color=='w'){
 					Moveable[this.pos_x][j]=true;
 					break;
@@ -54,7 +54,7 @@ public class Rook extends Piece {
 		if(this.color=='w'){
 
 			for(int i=this.pos_x+1; i<8; i++){
-				if(board[i][this.pos_y].piece==null) Moveable[i][this.pos_y]=true;
+				if(board[i][this.pos_y].piece==null || board[i][this.pos_y].piece.type=='F') Moveable[i][this.pos_y]=true;
 				else if(board[i][this.pos_y].piece.color=='b'){
 					Moveable[i][this.pos_y]=true;
 					break;
@@ -63,7 +63,7 @@ public class Rook extends Piece {
 			}
 
 			for(int i=this.pos_x-1; i>=0; i--){
-				if(board[i][this.pos_y].piece==null) Moveable[i][this.pos_y]=true;
+				if(board[i][this.pos_y].piece==null || board[i][this.pos_y].piece.type=='F') Moveable[i][this.pos_y]=true;
 				else if(board[i][this.pos_y].piece.color=='b'){
 					Moveable[i][this.pos_y]=true;
 					break;
@@ -72,7 +72,7 @@ public class Rook extends Piece {
 			}
 
 			for(int j=this.pos_y+1; j<8; j++){
-				if(board[this.pos_x][j].piece==null) Moveable[this.pos_x][j]=true;
+				if(board[this.pos_x][j].piece==null || board[this.pos_x][j].piece.type=='F') Moveable[this.pos_x][j]=true;
 				else if(board[this.pos_x][j].piece.color=='b'){
 					Moveable[this.pos_x][j]=true;
 					break;
@@ -81,7 +81,7 @@ public class Rook extends Piece {
 			}
 
 			for(int j=this.pos_y-1; j>=0; j--){
-				if(board[this.pos_x][j].piece==null) Moveable[this.pos_x][j]=true;
+				if(board[this.pos_x][j].piece==null || board[this.pos_x][j].piece.type=='F') Moveable[this.pos_x][j]=true;
 				else if(board[this.pos_x][j].piece.color=='b'){
 					Moveable[this.pos_x][j]=true;
 					break;

@@ -168,7 +168,6 @@ public class ChessBoard extends JFrame {
 	
 	Square[][] sq;
 	int turn;
-	boolean gameEnds;
 	boolean wr1, wr2, wk, br1, br2, bk;	// whether Rooks and King have not moved yet
 	boolean wkc, wqc, bkc, bqc; 		// whether Castling is possible
 	
@@ -196,7 +195,6 @@ public class ChessBoard extends JFrame {
 		this.turn = 0;
 		this.wr1 = true; this.wr2 = true; this.wk = true; this.br1 = true; this.br2 = true; this.bk = true;
 		this.wkc = true; this.wqc = true; this.bkc = true; this.bqc = true; 
-		this.gameEnds = false;
 		
 		this.selectstate = false;
 		
@@ -328,11 +326,6 @@ public class ChessBoard extends JFrame {
 		for (int i=7; i>=0; i--)
 			for (int j=0; j<8; j++)
 				sq[i][j].clickable = clk;
-	}
-	
-	public boolean isFinish() {
-		
-		return this.gameEnds;
 	}
 	
 	// Move a piece from (x1, y1) to (x2, y2), assuming the move is valid.

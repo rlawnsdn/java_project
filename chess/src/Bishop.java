@@ -18,7 +18,7 @@ public class Bishop extends Piece {
 			// Upper Right Side
 			int i = this.pos_x+1, j = this.pos_y+1;
 			while(0<=i && i<8 && 0<=j && j<8){
-				if(board[i][j].piece==null) Moveable[i][j]=true;
+				if(board[i][j].piece==null || board[i][j].piece.type=='F') Moveable[i][j]=true;
 				else if(board[i][j].piece.color=='b') break;
 				else{
 					Moveable[i][j]=true;
@@ -30,7 +30,7 @@ public class Bishop extends Piece {
 			// Upper Left Side
 			i=this.pos_x+1; j=this.pos_y-1;
 			while(0<=i && i<8 && 0<=j && j<8){
-				if(board[i][j].piece==null) Moveable[i][j]=true;
+				if(board[i][j].piece==null || board[i][j].piece.type=='F') Moveable[i][j]=true;
 				else if(board[i][j].piece.color=='b') break;
 				else{
 					Moveable[i][j]=true;
@@ -44,7 +44,7 @@ public class Bishop extends Piece {
 			while(0<=i && i<8 && 0<=j && j<8){
 				if(i==0 && j>0 && j<4) wqc=false;
 				if(i==0 && j>4 && j<8) wkc=false;
-				if(board[i][j].piece==null) Moveable[i][j]=true;
+				if(board[i][j].piece==null || board[i][j].piece.type=='F') Moveable[i][j]=true;
 				else if(board[i][j].piece.color=='b') break;
 				else{
 					Moveable[i][j]=true;
@@ -58,7 +58,7 @@ public class Bishop extends Piece {
 			while(0<=i && i<8 && 0<=j && j<8){
 				if(i==0 && j>0 && j<4) wqc=false;
 				if(i==0 && j>4 && j<8) wkc=false;
-				if(board[i][j].piece==null) Moveable[i][j]=true;
+				if(board[i][j].piece==null || board[i][j].piece.type=='F') Moveable[i][j]=true;
 				else if(board[i][j].piece.color=='b') break;
 				else{
 					Moveable[i][j]=true;
@@ -75,7 +75,7 @@ public class Bishop extends Piece {
 			while(0<=i && i<8 && 0<=j && j<8){
 				if(i==7 && j>0 && j<4) bqc=false;
 				if(i==7 && j>4 && j<8) bkc=false;
-				if(board[i][j].piece==null) Moveable[i][j]=true;
+				if(board[i][j].piece==null || board[i][j].piece.type=='F') Moveable[i][j]=true;
 				else if(board[i][j].piece.color=='w') break;
 				else{
 					Moveable[i][j]=true;
@@ -89,7 +89,7 @@ public class Bishop extends Piece {
 			while(0<=i && i<8 && 0<=j && j<8){
 				if(i==7 && j>0 && j<4) bqc=false;
 				if(i==7 && j>4 && j<8) bkc=false;
-				if(board[i][j].piece==null) Moveable[i][j]=true;
+				if(board[i][j].piece==null || board[i][j].piece.type=='F') Moveable[i][j]=true;
 				else if(board[i][j].piece.color=='w') break;
 				else{
 					Moveable[i][j]=true;
@@ -101,7 +101,7 @@ public class Bishop extends Piece {
 			// Lower Right Side
 			i=this.pos_x-1; j=this.pos_y+1;
 			while(0<=i && i<8 && 0<=j && j<8){
-				if(board[i][j].piece==null) Moveable[i][j]=true;
+				if(board[i][j].piece==null || board[i][j].piece.type=='F') Moveable[i][j]=true;
 				else if(board[i][j].piece.color=='w') break;
 				else{
 					Moveable[i][j]=true;
@@ -113,7 +113,7 @@ public class Bishop extends Piece {
 			// Lower Left Side
 			i=this.pos_x-1; j=this.pos_y-1;
 			while(0<=i && i<8 && 0<=j && j<8){
-				if(board[i][j].piece==null) Moveable[i][j]=true;
+				if(board[i][j].piece==null || board[i][j].piece.type=='F') Moveable[i][j]=true;
 				else if(board[i][j].piece.color=='w') break;
 				else{
 					Moveable[i][j]=true;
