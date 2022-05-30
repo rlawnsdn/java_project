@@ -18,7 +18,7 @@ public class Pawn extends Piece {
 						// Basically, a Pawn may move a single square straightly forward
 						if(board[i][j].piece==null){
 							if(j==this.pos_y) Moveable[i][j]=true;
-							else{}
+							else{Moveable[i][j]=false;}
 						}
 						// If a Pawn catches other pieces, move a single square diagonally forward
 						else if(board[i][j].piece.color=='b' && (Math.abs(this.pos_y-j)==1)) Moveable[i][j]=true;
@@ -36,15 +36,15 @@ public class Pawn extends Piece {
 					if(this.pos_x-1 == i){
 						if(board[i][j].piece==null){
 							if(j==this.pos_y) Moveable[i][j]=true;
-							else {}
+							else {Moveable[i][j]=false;}
 						}
 						else if(board[i][j].piece.color=='w' && (Math.abs(this.pos_y-j)==1)) Moveable[i][j]=true;
 						else Moveable[i][j]=false;
 					}
 					else Moveable[i][j]=false;
 				}
-				if(this.pos_x==6 && board[4][this.pos_y].piece==null && board[5][this.pos_y].piece==null) Moveable[4][this.pos_y]=true;
 			}
+			if(this.pos_x==6 && board[4][this.pos_y].piece==null && board[5][this.pos_y].piece==null) Moveable[4][this.pos_y]=true;
 		}
 	}
 }
