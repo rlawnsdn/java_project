@@ -173,6 +173,7 @@ public class ChessBoard extends JFrame {
 	
 	boolean selectstate; // if true, the button may work to determine the destination of the selected piece
 	boolean playsWhite;
+	boolean piecemoveblock;
 	
 	Piece wKing, bKing;
 	
@@ -197,7 +198,7 @@ public class ChessBoard extends JFrame {
 		this.wkc = true; this.wqc = true; this.bkc = true; this.bqc = true; 
 		
 		this.selectstate = false;
-		
+		this.piecemoveblock = false;
 		this.preferredPromotion = 'Q';
 		this.commandType = -1;
 		
@@ -237,7 +238,7 @@ public class ChessBoard extends JFrame {
 					@Override
 					public void actionPerformed (ActionEvent e) {
 						
-						if ((turn%2 == 0) != playsWhite) return;
+						if ((turn%2 == 0) != playsWhite || piecemoveblock) return;
 						
 						System.out.println("Button Clicked. " + i + "," + j);
 						if (s.piece != null && s.piece.color == (turn%2 == 0 ? 'w' : 'b')) {
@@ -282,6 +283,7 @@ public class ChessBoard extends JFrame {
 							else {
 								setClickable(false);
 								
+								piecemoveblock = false;
 								commandType = -1;
 								turn++;
 							}

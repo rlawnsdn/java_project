@@ -72,7 +72,8 @@ class PlayerClient extends Thread {
 					cboard.movepiece(c[0]-48, c[1]-48, c[2]-48, c[3]-48, c[4]);
 					cboard.updateMovableForAllPieces();
 					cboard.turn++;
-					cboard.setClickable(true);
+					cboard.piecemoveblock = false;
+					
 					bgui.updateBoardGUI(cboard.sq);
 					bgui.bframe.setSystemMsg("Your Turn!", Color.green);
 					bgui.bframe.optionbuttons1.setVisible(true);
@@ -90,10 +91,11 @@ class PlayerClient extends Thread {
 					}
 					bgui.bframe.optionbuttons1.setVisible(c-48 == 3);
 					bgui.bframe.optionbuttons2.setVisible(c-48 == 0);
+					cboard.turn++;
+					cboard.piecemoveblock = (c-48 < 3);
 					
 					if (c-48 == 1 || c-48 == 2) break;
 					
-					cboard.turn++;
 					myturn ^= true;
 					continue;
 				}
